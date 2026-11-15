@@ -39,9 +39,10 @@ export default function Seccion1() {
         @keyframes s1-latido { 0% { transform: scale(1); opacity: .7; } 100% { transform: scale(2.6); opacity: 0; } }
       `}</style>
 
-      {/* Fondo: cielo de tormenta con profundidad. */}
+      {/* Fondo: cielo de tormenta con profundidad. Sigue azul hasta el horizonte (más claro abajo, como de noche). */}
       <div ref={fondoRef} aria-hidden className="pointer-events-none absolute inset-0 -z-10">
-        <div className="absolute inset-0 bg-[radial-gradient(120%_80%_at_70%_-10%,#1a2740_0%,#0c1424_45%,#060a13_80%)]" />
+        <div className="absolute inset-0 bg-[linear-gradient(180deg,#121d33_0%,#0d172b_45%,#13213a_78%,#1d2d4a_100%)]" />
+        <div className="absolute inset-0 bg-[radial-gradient(120%_80%_at_70%_-10%,#1a2740_0%,transparent_60%)]" />
         <div className="absolute inset-0 bg-[radial-gradient(60%_50%_at_78%_55%,rgb(47_127_209/0.16),transparent_70%)]" />
         <Tormenta activo={visible} menos={menos} />
       </div>
@@ -55,10 +56,10 @@ export default function Seccion1() {
         <Globo activo={visible} menos={menos} />
       </div>
 
-      {/* Velo inferior: funde el globo con la sección siguiente y deja leer los créditos. */}
+      {/* Velo corto abajo: funde el cielo con la sección siguiente sin dejar una franja negra. */}
       <div
         aria-hidden
-        className="pointer-events-none absolute inset-x-0 bottom-0 z-[1] h-[18svh] bg-linear-to-t from-bg via-bg/60 to-transparent lg:h-[16svh]"
+        className="pointer-events-none absolute inset-x-0 bottom-0 z-[1] h-[9svh] bg-linear-to-t from-bg to-transparent"
       />
 
       {/* Contenido. */}
@@ -118,7 +119,7 @@ export default function Seccion1() {
       </div>
 
       {/* Pie: créditos a la izquierda e indicación para bajar al centro. */}
-      <div className="pointer-events-none absolute inset-x-0 bottom-0 z-10 px-4 pb-4 sm:px-8 sm:pb-5">
+      <div className="pointer-events-none absolute inset-x-0 bottom-0 z-10 px-4 pb-2 sm:px-8 sm:pb-3">
         <div className="mx-auto flex max-w-6xl flex-col items-center gap-3 lg:flex-row lg:items-end lg:justify-between">
           <button
             type="button"

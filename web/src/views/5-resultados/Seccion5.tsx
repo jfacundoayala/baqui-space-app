@@ -6,6 +6,7 @@ import Estado from "@/components/Estado";
 import Fuente from "@/components/Fuente";
 import Reveal from "@/components/Reveal";
 import Encabezado from "@/components/Encabezado";
+import Final from "@/components/Final";
 import { useMenosMovimiento } from "@/components/hooks";
 import datos from "@/data/resultados.json";
 import { textos as t } from "./textos";
@@ -21,13 +22,11 @@ function fmt(n: number, decimales = 1): string {
 /* ---------- Datos medidos (todo sale del JSON; ver sus "_fuente") ---------- */
 
 // El secado (media vida) no se muestra: es una serie de pasadas y BAQUI es una consulta de hoy.
-const { radar, medicion, eco, suben, agua } = datos;
+const { radar, medicion, eco, suben, agua, zona_abierta: abierta } = datos;
 const subidaDb = eco.subida_db;
 const DECIMALES_DB = 2;
 /** Puntos del eje que subieron más de 1 dB, de cada 10 (de 1 a 3 dB más los de más de 3 dB). */
 const subenDeCada10 = Math.round((suben.pct_1_a_3_db + suben.pct_mas_de_3_db) / 10);
-/** Lo mismo en el campo a más de 300 m de un camino: cuánto da el moteado del radar (y el monte) sin camino. */
-const campoDeCada10 = Math.round((suben.pct_campo_lejos_1_a_3_db + suben.pct_campo_lejos_mas_de_3_db) / 10);
 /** Decimales justos para que el porcentaje de agua no se lea como cero (0,006 → 3). */
 const decimalesAgua = Math.max(1, -Math.floor(Math.log10(agua.pct_con_agua)));
 
@@ -287,8 +286,10 @@ export default function Seccion5() {
   const contado = useContador(subidaDb, activo, menos);
 
   return (
-    <Seccion id="s5" titulo={t.tituloSeccion}>
+    // Abajo deja lugar para el camino del cierre (Final).
+    <Seccion id="s5" titulo={t.tituloSeccion} className="pb-[195px]! sm:pb-[245px]! lg:pb-[305px]!">
       <Fondo />
+      <Final />
 
       <div className="mx-auto flex w-full max-w-6xl flex-col gap-4 sm:gap-5 lg:gap-4">
         {/* Encabezado */}
@@ -350,7 +351,7 @@ export default function Seccion5() {
                   icono={TrendingUp}
                   color="text-accent"
                   valor={t.subenValor(fmt(subenDeCada10, 0))}
-                  texto={t.subenTexto(fmt(campoDeCada10, 0))}
+                  texto={t.subenTexto(fmt(abierta.campo_db, 2), fmt(abierta.eje_db, 2))}
                 />
                 <Apoyo
                   icono={Waves}

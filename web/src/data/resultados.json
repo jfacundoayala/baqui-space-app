@@ -10,7 +10,7 @@
     "verificar_url": "https://search.asf.alaska.edu/"
   },
   "medicion": {
-    "_fuente": "salida_corredor.json → km_osm_por_tipo.tierra y 1_eje_tierra.n_px. Eje = píxeles a 10 m o menos del centro del camino de OSM.",
+    "_fuente": "salida_corredor.json → km_osm_por_tipo.tierra y 1_eje_tierra.n_px. Eje = píxeles a 10 m o menos del centro del camino de OSM. 'Tierra' = todo camino sin asfalto ni ripio: unos 420 km tienen surface=unpaved en OSM y el resto no tiene dato de superficie (baqui/chequeos/caminos_sar.py). Por eso la web dice 'sin pavimento'.",
     "km_tierra": 1201.7,
     "pixeles_eje": 53611
   },
@@ -24,6 +24,11 @@
     "pct_mas_de_3_db": 11.0,
     "pct_campo_lejos_1_a_3_db": 24.0,
     "pct_campo_lejos_mas_de_3_db": 3.2
+  },
+  "zona_abierta": {
+    "_fuente": "Sin monte, para comparar lo mismo con lo mismo. salida_corredor.json → 1_eje_tierra_abierto.dHH_mediana_db (eje del camino sin monte); salida_rojos.json → campo_300a1000m_corredor.dHH_abierto (campo abierto a 300-1000 m de cualquier camino). Muestra que se mojó toda la zona, no solo el camino (docs/HIPOTESIS-FISICA.md, sección 3, fila 2).",
+    "eje_db": 1.63,
+    "campo_db": 1.57
   },
   "agua": {
     "_fuente": "salida_corredor.json → 2_eje_tierra.px_agua_abierta_nueva y pct_agua_abierta_nueva. Solo agua abierta: bajo el monte (38,1 % del eje) no se puede confirmar.",

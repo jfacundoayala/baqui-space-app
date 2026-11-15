@@ -142,6 +142,15 @@ function crearCapa(
       ctx.fillRect(x + dx - rad, y - rad, rad * 2, rad * 2);
     }
   }
+
+  // Abajo la capa se desvanece de a poco: así las nubes no terminan en una línea recta.
+  ctx.globalCompositeOperation = "destination-out";
+  const fin = ctx.createLinearGradient(0, TILE_H * 0.55, 0, TILE_H);
+  fin.addColorStop(0, "rgba(0,0,0,0)");
+  fin.addColorStop(1, "rgba(0,0,0,1)");
+  ctx.fillStyle = fin;
+  ctx.fillRect(0, TILE_H * 0.55, TILE_W, TILE_H * 0.45);
+  ctx.globalCompositeOperation = "source-over";
   return c;
 }
 
@@ -157,9 +166,9 @@ export default function Tormenta({ activo, menos }: { activo: boolean; menos: bo
     if (!ctx) return;
 
     const capas: Capa[] = [
-      { img: crearCapa(11, 70, [30, 41, 64], 0.7, 0.72, 1.3, 0), velocidad: 5, alto: 0.78, alfa: 1 },
-      { img: crearCapa(23, 55, [52, 66, 94], 0.5, 0.62, 1.0, 5), velocidad: 11, alto: 0.9, alfa: 1 },
-      { img: crearCapa(37, 34, [78, 92, 122], 0.32, 0.5, 1.15, 3), velocidad: 19, alto: 0.7, alfa: 1 },
+      { img: crearCapa(11, 70, [30, 41, 64], 0.7, 0.72, 1.3, 0), velocidad: 5, alto: 0.95, alfa: 1 },
+      { img: crearCapa(23, 55, [52, 66, 94], 0.5, 0.62, 1.0, 5), velocidad: 11, alto: 1, alfa: 1 },
+      { img: crearCapa(37, 34, [78, 92, 122], 0.32, 0.5, 1.15, 3), velocidad: 19, alto: 0.85, alfa: 1 },
     ];
 
     let W = 1;
