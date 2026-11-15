@@ -25,6 +25,9 @@
   color-scheme: dark;
 }
 
+/* Variante para quien pidió menos transparencia: fondos opacos (ver abajo la regla de los desenfoques). */
+@custom-variant opaco (@media (prefers-reduced-transparency: reduce));
+
 @theme inline {
   --color-bg: var(--bg);
   --color-bg-2: var(--bg-2);
@@ -83,6 +86,11 @@ body {
     backdrop-filter: none;
     -webkit-backdrop-filter: none;
   }
+  /* Cualquier desenfoque de Tailwind (backdrop-blur-*) se apaga; el fondo opaco lo pone la variante "opaco:". */
+  [class*="backdrop-blur"] {
+    backdrop-filter: none !important;
+    -webkit-backdrop-filter: none !important;
+  }
 }
 
 /* Entrada suave: sube un poco al aparecer. */
@@ -107,7 +115,6 @@ body {
 :focus-visible {
   outline: 2px solid var(--accent);
   outline-offset: 3px;
-  border-radius: 6px;
 }
 
 @media (prefers-reduced-motion: reduce) {

@@ -118,7 +118,8 @@ export default function Tormenta({ activo, menos }: { activo: boolean; menos: bo
     }
 
     function ajustar() {
-      const dpr = Math.min(window.devicePixelRatio || 1, 1.5);
+      // En el celular la lluvia se dibuja a densidad 1: se ve igual y pesa menos.
+      const dpr = Math.min(window.devicePixelRatio || 1, window.innerWidth < 1024 ? 1 : 1.5);
       W = Math.max(1, canvas!.clientWidth);
       H = Math.max(1, canvas!.clientHeight);
       canvas!.width = Math.round(W * dpr);

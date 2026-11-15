@@ -16,7 +16,8 @@ const TIPOS: Record<string, string> = {
 
 export const T4 = {
   tituloSeccion: "La demo: ¿llegás hoy?",
-  etiqueta: "04 · La demo",
+  /** El número (04) y la raya los pone el componente Encabezado. */
+  etiqueta: "La demo",
   titulo: "¿Llegás hoy?",
   bajada: "Elegí a dónde vas. BAQUI mira cómo está el camino hoy y te dice si podés salir.",
   bajadaNota: "En BAQUI el agua la ve el radar NISAR. En esta demo el agua es simulada.",
@@ -51,6 +52,7 @@ export const T4 = {
     "no-llegas": "No hay otro camino. Hoy no llegás: no salgas.",
   },
 
+  /** Solo cuando no hay otro camino (respuesta "no salgas"). */
   unSoloCamino: "En el campo, casi siempre hay un solo camino.",
 
   caminos: {

@@ -1,10 +1,12 @@
 "use client";
 // Los dos recuadros tipo buscador: [Gral. San Martín] → [¿Hacia dónde?]. En el celular, sin la flecha. En una sola fila, también en 375 px.
-// El origen va siempre entero; si no entra, el que se corta es el nombre del destino.
+// El origen va siempre entero; si no entra, el que se corta es el nombre del destino (solo en el celular: en
+// escritorio el panel mide 432 px, así entra entero el nombre más largo, "Paraje Laguna El Lobo").
 import { ArrowRight, Check, ChevronDown, MapPin } from "lucide-react";
 import { useEffect, useId, useRef, useState } from "react";
 import type { Destino } from "./datos";
 import { T4 } from "./textos";
+import s from "./demo.module.css";
 
 export default function Buscador({
   destinos,
@@ -24,21 +26,21 @@ export default function Buscador({
   // Al abrir, el foco va a la opción elegida. Escape o tocar afuera cierra.
   useEffect(() => {
     if (!abierto) return;
-    lista.current?.querySelector<HTMLButtonElement>("[aria-current='true']")?.focus();
+    lista.current?.querySelector<HTMLButtonElement>("[aria-current='true']")?.focus({ preventScroll: true });
     const afuera = (e: PointerEvent) => {
       if (!caja.current?.contains(e.target as Node)) setAbierto(false);
     };
     const tecla = (e: KeyboardEvent) => {
       if (e.key === "Escape") {
         setAbierto(false);
-        boton.current?.focus();
+        boton.current?.focus({ preventScroll: true });
       }
       if (e.key === "ArrowDown" || e.key === "ArrowUp") {
         e.preventDefault();
         const items = Array.from(lista.current?.querySelectorAll<HTMLButtonElement>("button") ?? []);
         const i = items.indexOf(document.activeElement as HTMLButtonElement);
         const sig = e.key === "ArrowDown" ? (i + 1) % items.length : (i - 1 + items.length) % items.length;
-        items[sig]?.focus();
+        items[sig]?.focus({ preventScroll: true });
       }
     };
     document.addEventListener("pointerdown", afuera);
@@ -52,7 +54,7 @@ export default function Buscador({
   const elegir = (id: string) => {
     onElegir(id);
     setAbierto(false);
-    boton.current?.focus();
+    boton.current?.focus({ preventScroll: true });
   };
 
   return (
@@ -85,7 +87,7 @@ export default function Buscador({
           aria-controls={idLista}
           aria-label={`${T4.buscador.abrir}. ${T4.buscador.elegido}: ${elegido.nombre}`}
           onClick={() => setAbierto((v) => !v)}
-          className="flex min-h-11 size-full min-w-0 items-center gap-2 rounded-xl bg-white/[0.07] px-2.5 py-2 text-left ring-1 ring-white/10 transition hover:bg-white/[0.11] sm:px-3.5"
+          className="flex min-h-11 size-full min-w-0 items-center gap-2 rounded-xl bg-white/[0.07] px-2.5 py-2 text-left ring-1 ring-white/10 transition-[background-color,scale] duration-150 ease-[cubic-bezier(0.23,1,0.32,1)] hover:bg-white/[0.11] motion-safe:active:scale-[0.98] sm:px-3.5"
         >
           <span className="flex min-w-0 flex-1 flex-col">
             <span className="text-xs text-ink-3">{T4.buscador.placeholder}</span>
@@ -96,7 +98,7 @@ export default function Buscador({
           </span>
           <ChevronDown
             aria-hidden
-            className={`size-4 shrink-0 text-ink-2 transition-transform duration-300 ${abierto ? "rotate-180" : ""}`}
+            className={`size-4 shrink-0 text-ink-2 transition-transform duration-200 ease-[cubic-bezier(0.23,1,0.32,1)] ${abierto ? "rotate-180" : ""}`}
           />
         </button>
 
@@ -105,8 +107,7 @@ export default function Buscador({
             ref={lista}
             id={idLista}
             aria-label={T4.buscador.lista}
-            className="rise absolute right-0 top-[calc(100%+0.5rem)] z-30 w-[min(20rem,calc(100vw-2rem))] overflow-hidden rounded-2xl border border-line bg-[#0b1220]/95 p-1.5 shadow-[0_24px_60px_-20px_rgb(0_0_0/0.9)] backdrop-blur-xl"
-            style={{ animationDuration: "0.35s" }}
+            className={`${s.pop} absolute right-0 top-[calc(100%+0.5rem)] z-30 w-[min(20rem,calc(100vw-2rem))] overflow-hidden rounded-2xl border border-line bg-[#0b1220]/95 p-1.5 shadow-[0_24px_60px_-20px_rgb(0_0_0/0.9)] backdrop-blur-xl opaco:bg-[#0b1220]`}
           >
             {destinos.map((d) => {
               const actual = d.id === elegido.id;
@@ -116,8 +117,8 @@ export default function Buscador({
                     type="button"
                     aria-current={actual ? "true" : undefined}
                     onClick={() => elegir(d.id)}
-                    className={`flex w-full items-center gap-3 rounded-xl px-3 py-2.5 text-left transition hover:bg-white/[0.08] ${
-                      actual ? "bg-white/[0.06]" : ""
+                    className={`flex w-full items-center gap-3 rounded-xl px-3 py-2.5 text-left transition-[background-color,scale] duration-150 ease-[cubic-bezier(0.23,1,0.32,1)] hover:bg-white/[0.12] motion-safe:active:scale-[0.98] ${
+                      actual ? "bg-white/[0.08]" : ""
                     }`}
                   >
                     <MapPin aria-hidden className="size-4 shrink-0 text-ink-3" strokeWidth={2} />

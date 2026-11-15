@@ -1,30 +1,38 @@
 {
-  "_fuente": "Calculado con datos/nisar/tramos_20261011_161A164.geojson (pipeline Python de Baqui). Real, no simulado.",
+  "_fuente": "Real, no simulado. Números copiados de datos/chequeos/salida_corredor.json (claves 1_eje_tierra, 2_eje_tierra y km_osm_por_tipo) y datos/nisar/secado.json (baqui/secado.py). Explicados en docs/HIPOTESIS-FISICA.md. NISAR GCOV, órbita 161 ascendente: pasada 2 días después de la lluvia contra la pasada de referencia de la misma órbita (no del todo seca: IMERG 3,95 mm ese día; una referencia mojada achica la suba, ver docs/HIPOTESIS-FISICA.md sección 4).",
   "radar": {
     "satelite": "NISAR (NASA-ISRO)",
     "banda": "L",
     "orbita": "161 ascendente",
     "frame": "164",
-    "pasada": "11/10/2026",
-    "referencia_seca": "29/09/2026",
     "archivo": "NISAR_L2_PR_GCOV_032_161_A_164_2005_DHDH_A_20261011T095615_20261011T095650_P05023_N_F_J_001",
     "archivo_referencia": "NISAR_L2_PR_GCOV_031_161_A_164_2005_DHDH_A_20260929T095615_20260929T095650_P05023_N_F_J_001",
     "verificar_url": "https://search.asf.alaska.edu/"
   },
-  "red": {
-    "km_total": 1231.0,
-    "tramos_total": 1387,
-    "km": { "intransitable": 23.0, "con_barro": 714.8, "transitable": 360.8, "sin_dato": 132.4 },
-    "tramos": { "intransitable": 23, "con_barro": 760, "transitable": 393, "sin_dato": 211 }
+  "medicion": {
+    "_fuente": "salida_corredor.json → km_osm_por_tipo.tierra y 1_eje_tierra.n_px. Eje = píxeles a 10 m o menos del centro del camino de OSM.",
+    "km_tierra": 1201.7,
+    "pixeles_eje": 53611
   },
   "eco": {
-    "camino_1_db": 3.4,
-    "zona_db": 1.1,
-    "texto": "El eco del radar subió 3,4 dB en el camino 1 entre el 29/09 y el 11/10: suelo empapado."
+    "_fuente": "salida_corredor.json → 1_eje_tierra.dHH_mediana_db (polarización HH, mediana del eje).",
+    "subida_db": 1.35
+  },
+  "suben": {
+    "_fuente": "salida_corredor.json → 1_eje_tierra.pct_dHH_sube_1_a_3 y pct_dHH_sube_mas_3; para comparar, 1_campo_lejos_300m (a más de 300 m de un camino, 69,8 % con monte). Son píxeles sueltos: el moteado del radar es de ±1,3 dB por píxel.",
+    "pct_1_a_3_db": 49.9,
+    "pct_mas_de_3_db": 11.0,
+    "pct_campo_lejos_1_a_3_db": 24.0,
+    "pct_campo_lejos_mas_de_3_db": 3.2
+  },
+  "agua": {
+    "_fuente": "salida_corredor.json → 2_eje_tierra.px_agua_abierta_nueva y pct_agua_abierta_nueva. Solo agua abierta: bajo el monte (38,1 % del eje) no se puede confirmar.",
+    "pixeles_con_agua": 3,
+    "pct_con_agua": 0.006
   },
   "secado": {
+    "_fuente": "datos/nisar/secado.json con baqui/secado.py: ajuste log-lineal sobre los caminos 1 a 3, 3 pares (pasada después de la lluvia contra su referencia) de 2, 7 y 10 días (sin el de 14, de otra versión de proceso). Mezcla 3 órbitas: indicativo (docs/HIPOTESIS-FISICA.md, fila 6).",
     "media_vida_dias": 5.7,
-    "pasadas_usadas": 4,
-    "texto": "Si no llueve, el barro baja a la mitad en 5,7 días. Lo medimos con 4 pasadas de NISAR."
+    "pasadas_usadas": 3
   }
 }

@@ -17,7 +17,7 @@ export default function Seccion({
     <section
       id={id}
       aria-label={titulo}
-      className={`relative isolate flex min-h-[100svh] snap-start flex-col justify-center overflow-hidden px-4 py-16 sm:px-8 ${className}`}
+      className={`relative isolate flex min-h-[100svh] snap-start flex-col justify-center overflow-hidden px-4 py-6 sm:px-8 sm:py-12 lg:py-10 ${className}`}
     >
       {children}
     </section>

@@ -1,5 +1,5 @@
 "use client";
-// Mapa satelital de la demo (Leaflet). Se carga solo en el cliente desde Demo.tsx (dynamic, sin SSR): ver Demo.tsx.
+// Mapa satelital de la demo (Leaflet). Se carga solo en el cliente desde Demo.tsx (import() en un efecto, sin SSR ni next/dynamic): ver useMapa en Demo.tsx.
 // El camino se dibuja neutro (blanco con borde oscuro); el agua lo tapa; el color va en el cartel.
 import "leaflet/dist/leaflet.css";
 import L from "leaflet";
@@ -32,6 +32,28 @@ const AGUA = "#2f7fd1";
 const AGUA_BORDE = "#a8d8ff";
 const LAGUNA = "#1b4a7d";
 const LAGUNA_BORDE = "#cfd8e6";
+
+/** Estilos fijos (mismo objeto en cada render: react-leaflet no vuelve a aplicar el estilo). */
+const ESTILO = {
+  brillo: { color: "#ffffff", weight: 18, opacity: 0.16, lineCap: "round", lineJoin: "round" },
+  bordePrincipal: { color: NEGRO, weight: 9, opacity: 0.85, lineCap: "round", lineJoin: "round" },
+  bordeNormal: { color: NEGRO, weight: 7, opacity: 0.85, lineCap: "round", lineJoin: "round" },
+  bordeSecundario: { color: NEGRO, weight: 7, opacity: 0.55, lineCap: "round", lineJoin: "round" },
+  caminoPrincipal: { color: CAMINO, weight: 5, opacity: 1, lineCap: "round", lineJoin: "round" },
+  caminoNormal: { color: CAMINO, weight: 3, opacity: 1, lineCap: "round", lineJoin: "round" },
+  caminoSecundario: {
+    color: CAMINO_SECUNDARIO,
+    weight: 3,
+    opacity: 0.75,
+    dashArray: "2 8",
+    lineCap: "round",
+    lineJoin: "round",
+  },
+  laguna: { color: LAGUNA_BORDE, weight: 1.5, dashArray: "5 5", fillColor: LAGUNA, fillOpacity: 0.5 },
+  aro: { color: AGUA_BORDE, weight: 2, fillColor: AGUA, fillOpacity: 0.55 },
+  puntoAgua: { color: AGUA_BORDE, weight: 2, fillColor: AGUA, fillOpacity: 1 },
+  ancla: { color: NEGRO, weight: 2, fillColor: "#ffffff", fillOpacity: 1 },
+} satisfies Record<string, L.PathOptions>;
 
 /* ------------------------------------------------------------------------------------------------
  * Contenedor del mapa a prueba de StrictMode y recarga en caliente.
@@ -110,11 +132,17 @@ function esEscritorio() {
   return typeof window !== "undefined" && window.matchMedia("(min-width: 1024px)").matches;
 }
 
-/** Margen para encuadrar: en escritorio el panel tapa la izquierda del mapa. */
-function margenes(): L.FitBoundsOptions {
+/** Rótulo "Agua sobre el camino" en el celular (va a la derecha del agua): lugar que se le deja a la derecha. */
+const LUGAR_ROTULO_AGUA_PX = 150;
+
+/**
+ * Margen para encuadrar: en escritorio el panel tapa la izquierda del mapa.
+ * `derecha`: px de más a la derecha en el celular (para el rótulo del agua, que si no queda cortado por el borde).
+ */
+function margenes(derecha = 0): L.FitBoundsOptions {
   return esEscritorio()
-    ? { paddingTopLeft: [452, 56], paddingBottomRight: [72, 56] }
-    : { paddingTopLeft: [28, 72], paddingBottomRight: [28, 28] };
+    ? { paddingTopLeft: [484, 56], paddingBottomRight: [72, 56] }
+    : { paddingTopLeft: [28, 72], paddingBottomRight: [28 + derecha, 28] };
 }
 
 function limites(datos: Datos, d: Destino): L.LatLngBounds {
@@ -124,23 +152,24 @@ function limites(datos: Datos, d: Destino): L.LatLngBounds {
 }
 
 /** Reencuadra al cambiar de destino. */
-function Encuadre({ bounds, menos }: { bounds: L.LatLngBounds; menos: boolean }) {
+function Encuadre({ bounds, menos, derecha }: { bounds: L.LatLngBounds; menos: boolean; derecha: number }) {
   const map = useMap();
-  const primera = useRef(true);
+  // El encuadre inicial lo hace el MapContainer (y el ResizeObserver de abajo): acá solo se vuela si cambió el
+  // destino. Se compara con los límites anteriores (no con una marca de "primera vez"), así el doble efecto de
+  // StrictMode no vuela al montar.
+  const anterior = useRef(bounds);
   useEffect(() => {
-    if (primera.current) {
-      primera.current = false;
-      return;
-    }
-    if (menos) map.fitBounds(bounds, margenes());
-    else map.flyToBounds(bounds, { ...margenes(), duration: 0.9, easeLinearity: 0.2 });
-  }, [bounds, map, menos]);
+    if (anterior.current === bounds) return;
+    anterior.current = bounds;
+    if (menos) map.fitBounds(bounds, margenes(derecha));
+    else map.flyToBounds(bounds, { ...margenes(derecha), duration: 0.9, easeLinearity: 0.2 });
+  }, [bounds, map, menos, derecha]);
   // Encuadre inicial y cada vez que cambia el tamaño del mapa (por ejemplo, si el mapa se creó antes de tener
   // tamaño, o al rotar el celular): sin esto Leaflet calcula el zoom con un tamaño viejo.
-  const actual = useRef(bounds);
+  const actual = useRef({ bounds, derecha });
   useEffect(() => {
-    actual.current = bounds;
-  }, [bounds]);
+    actual.current = { bounds, derecha };
+  }, [bounds, derecha]);
   useEffect(() => {
     let ancho = 0;
     let alto = 0;
@@ -150,7 +179,7 @@ function Encuadre({ bounds, menos }: { bounds: L.LatLngBounds; menos: boolean })
       ancho = width;
       alto = height;
       map.invalidateSize({ animate: false });
-      map.fitBounds(actual.current, { ...margenes(), animate: false });
+      map.fitBounds(actual.current.bounds, { ...margenes(actual.current.derecha), animate: false });
     });
     ro.observe(map.getContainer());
     return () => ro.disconnect();
@@ -169,7 +198,9 @@ function useCrecida(objetivo: number, clave: string, menos: boolean, visible: bo
       claveAnterior.current = clave;
       desde = 0; // consulta nueva: el agua aparece desde cero
     }
-    if (menos || !visible) {
+    // Menos movimiento, fuera de pantalla o nada que animar (por ejemplo, al cargar, antes de que el agua aparezca):
+    // sin requestAnimationFrame.
+    if (menos || !visible || desde === objetivo) {
       actual.current = objetivo;
       setT(objetivo);
       return;
@@ -207,6 +238,99 @@ function icono(nombre: string, clase: string): L.DivIcon {
   });
 }
 
+/**
+ * Agua de hoy que aparece en cada consulta. Es el único componente que escucha la animación (t cambia en cada
+ * cuadro durante ~0,8 s): el resto del mapa (caminos, lagunas, carteles, marcadores) no se vuelve a dibujar.
+ */
+function AguaAnimada({
+  aguaNueva,
+  metrosCharco,
+  aguaSobreCamino,
+  clave,
+  menos,
+  visible,
+  escritorio,
+}: {
+  aguaNueva: Agua[];
+  metrosCharco: Record<string, number>;
+  aguaSobreCamino: { n: number; centro: LatLon }[];
+  clave: string;
+  menos: boolean;
+  visible: boolean;
+  escritorio: boolean;
+}) {
+  const t = useCrecida(aguaNueva.length > 0 ? 1 : 0, clave, menos, visible);
+  const factor = 0.18 + 0.82 * t;
+  return (
+    <>
+      {t > 0.001 &&
+        aguaNueva.map((a) => (
+          <Polygon
+            pane="agua"
+            key={`${a.id}-${clave}`}
+            positions={escalar(a, factor)}
+            interactive={false}
+            pathOptions={{
+              color: AGUA_BORDE,
+              weight: 1.5,
+              opacity: Math.min(1, t * 1.4),
+              fillColor: AGUA,
+              fillOpacity: 0.72 * t,
+            }}
+          />
+        ))}
+      {/* El charco chico es pequeño para el zoom: un aro lo señala (solo si toca el recorrido). */}
+      {t > 0.6 &&
+        aguaNueva
+          .filter((a) => a.tipo === "charco" && (metrosCharco[a.id] ?? 0) > 0)
+          .map((a) => (
+            <CircleMarker
+              pane="agua"
+              key={`aro-${a.id}-${clave}`}
+              center={a.centro}
+              radius={11}
+              interactive={false}
+              pathOptions={ESTILO.aro}
+            >
+              <Tooltip permanent direction={escritorio ? "left" : "right"} offset={[escritorio ? -12 : 12, 0]} opacity={1} className={s.rotulo} pane="tooltipPane">
+                {T4.mapa.charco(metrosCharco[a.id] ?? 0)}
+              </Tooltip>
+            </CircleMarker>
+          ))}
+      {/* Agua corta sobre el camino (por ejemplo, 150 m entrando a un paraje): no se ve al zoom del recorrido.
+          Un punto chico sobre el agua y un rótulo abajo, con una línea que lo señala. No es un aro: si el agua está
+          pegada al paraje, un aro rodearía el marcador y parecería que el inundado es el paraje. El nombre del
+          destino va arriba del marcador; el rótulo del agua, abajo (en el celular, a la derecha: el mapa es chico y
+          abajo taparía el camino). */}
+      {t > 0.6 &&
+        aguaSobreCamino.map((a) => (
+          <CircleMarker
+            pane="carteles"
+            key={`sobre-${clave}-${a.n}`}
+            center={a.centro}
+            radius={4}
+            interactive={false}
+            pathOptions={ESTILO.puntoAgua}
+          >
+            <Tooltip
+              permanent
+              direction={escritorio ? "bottom" : "right"}
+              offset={escritorio ? [0, 4] : [4, 0]}
+              opacity={1}
+              className={s.cartel}
+              pane="tooltipPane"
+            >
+              <div className={`flex items-center ${escritorio ? "flex-col" : "flex-row"}`}>
+                <span aria-hidden className={escritorio ? "h-5 w-px bg-[#a8d8ff]" : "h-px w-4 bg-[#a8d8ff]"} />
+                <span className={s.rotuloAgua}>{T4.mapa.aguaSobreCamino}</span>
+              </div>
+            </Tooltip>
+          </CircleMarker>
+        ))}
+    </>
+  );
+}
+
 export default function MapaDemo({
   datos,
   destino,
@@ -224,13 +348,13 @@ export default function MapaDemo({
   onElegir,
 }: Props) {
   const bounds = useMemo(() => limites(datos, destino), [datos, destino]);
-  const [inicial] = useState(() => ({ bounds, opciones: margenes() }));
-  const t = useCrecida(aguaNueva.length > 0 ? 1 : 0, `${destino.id}-${vuelta}`, menosMovimiento, visible);
+  // En el celular, si hay rótulo de agua sobre el camino, se le deja lugar a la derecha.
+  const derecha = !esEscritorio() && aguaSobreCamino.length > 0 ? LUGAR_ROTULO_AGUA_PX : 0;
+  const [inicial] = useState(() => ({ bounds, opciones: margenes(derecha) }));
   // En pantallas táctiles el mapa no se arrastra con un dedo, así la página sigue bajando.
   const [movil] = useState(() => window.matchMedia("(pointer: coarse)").matches);
   // En escritorio el rótulo del charco va a la izquierda (a la derecha choca con el cartel del camino 1).
   const [escritorio] = useState(esEscritorio);
-  const factor = 0.18 + 0.82 * t;
 
   const iconoOrigen = useMemo(() => icono(T4.mapa.origen, s.lugarOrigen), []);
   const iconos = useMemo(
@@ -263,7 +387,7 @@ export default function MapaDemo({
       <TileLayer url={SATELITE} maxNativeZoom={15} maxZoom={17} />
       {/* En pantallas táctiles el mapa se encuadra solo y se acerca con dos dedos: sin botones de zoom. */}
       {!movil && <ZoomControl position="bottomright" />}
-      <Encuadre bounds={bounds} menos={menosMovimiento} />
+      <Encuadre bounds={bounds} menos={menosMovimiento} derecha={derecha} />
 
       {/* Caminos: neutros, el recomendado más grueso y con brillo blanco. */}
       <>
@@ -275,36 +399,22 @@ export default function MapaDemo({
             return (
               <Fragment key={`${destino.id}-${c.n}-${principal ? "p" : "s"}`}>
                 {principal && (
-                  <Polyline
-                    pane="caminos"
-                    positions={c.coords}
-                    pathOptions={{ color: "#ffffff", weight: 18, opacity: 0.16, lineCap: "round", lineJoin: "round" }}
-                    interactive={false}
-                  />
+                  <Polyline pane="caminos" positions={c.coords} pathOptions={ESTILO.brillo} interactive={false} />
                 )}
                 <Polyline
                   pane="caminos"
                   positions={c.coords}
-                  pathOptions={{
-                    color: NEGRO,
-                    weight: principal ? 9 : 7,
-                    opacity: secundario ? 0.55 : 0.85,
-                    lineCap: "round",
-                    lineJoin: "round",
-                  }}
+                  pathOptions={
+                    principal ? ESTILO.bordePrincipal : secundario ? ESTILO.bordeSecundario : ESTILO.bordeNormal
+                  }
                   interactive={false}
                 />
                 <Polyline
                   pane="caminos"
                   positions={c.coords}
-                  pathOptions={{
-                    color: secundario ? CAMINO_SECUNDARIO : CAMINO,
-                    weight: principal ? 5 : 3,
-                    opacity: secundario ? 0.75 : 1,
-                    dashArray: secundario ? "2 8" : undefined,
-                    lineCap: "round",
-                    lineJoin: "round",
-                  }}
+                  pathOptions={
+                    principal ? ESTILO.caminoPrincipal : secundario ? ESTILO.caminoSecundario : ESTILO.caminoNormal
+                  }
                   interactive={false}
                 />
               </Fragment>
@@ -320,7 +430,7 @@ export default function MapaDemo({
             key={`${a.id}-${lagunasQueTocan.has(a.id) ? "r" : "s"}`}
             positions={a.coords}
             interactive={false}
-            pathOptions={{ color: LAGUNA_BORDE, weight: 1.5, dashArray: "5 5", fillColor: LAGUNA, fillOpacity: 0.5 }}
+            pathOptions={ESTILO.laguna}
           >
             {lagunasQueTocan.has(a.id) && (
               <Tooltip permanent direction="right" offset={[24, 0]} opacity={1} className={s.rotulo} pane="tooltipPane">
@@ -329,66 +439,32 @@ export default function MapaDemo({
             )}
           </Polygon>
         ))}
-        {t > 0.001 &&
-          aguaNueva.map((a) => (
-            <Polygon
-              pane="agua"
-              key={`${a.id}-${destino.id}-${vuelta}`}
-              positions={escalar(a, factor)}
-              interactive={false}
-              pathOptions={{
-                color: AGUA_BORDE,
-                weight: 1.5,
-                opacity: Math.min(1, t * 1.4),
-                fillColor: AGUA,
-                fillOpacity: 0.72 * t,
-              }}
-            />
-          ))}
-        {/* El charco chico es pequeño para el zoom: un aro lo señala (solo si toca el recorrido). */}
-        {t > 0.6 &&
-          aguaNueva
-            .filter((a) => a.tipo === "charco" && (metrosCharco[a.id] ?? 0) > 0)
-            .map((a) => (
-              <CircleMarker
-                pane="agua"
-                key={`aro-${a.id}-${destino.id}`}
-                center={a.centro}
-                radius={11}
-                interactive={false}
-                pathOptions={{ color: AGUA_BORDE, weight: 2, fillColor: AGUA, fillOpacity: 0.55 }}
-              >
-                <Tooltip permanent direction={escritorio ? "left" : "right"} offset={[escritorio ? -12 : 12, 0]} opacity={1} className={s.rotulo} pane="tooltipPane">
-                  {T4.mapa.charco(metrosCharco[a.id] ?? 0)}
-                </Tooltip>
-              </CircleMarker>
-            ))}
-        {/* Agua corta sobre el camino (por ejemplo, 150 m entrando a un paraje): un aro y un rótulo la señalan. */}
-        {t > 0.6 &&
-          aguaSobreCamino.map((a) => (
-            <CircleMarker
-              pane="agua"
-              key={`sobre-${destino.id}-${a.n}-${vuelta}`}
-              center={a.centro}
-              radius={15}
-              interactive={false}
-              pathOptions={{ color: AGUA_BORDE, weight: 2.5, fillColor: AGUA, fillOpacity: 0.35 }}
-            >
-              <Tooltip permanent direction="auto" offset={[18, 10]} opacity={1} className={s.rotulo} pane="tooltipPane">
-                {T4.mapa.aguaSobreCamino}
-              </Tooltip>
-            </CircleMarker>
-          ))}
+        <AguaAnimada
+          aguaNueva={aguaNueva}
+          metrosCharco={metrosCharco}
+          aguaSobreCamino={aguaSobreCamino}
+          clave={`${destino.id}-${vuelta}`}
+          menos={menosMovimiento}
+          visible={visible}
+          escritorio={escritorio}
+        />
       </>
 
-      {/* Carteles, uno por camino, anclados arriba del camino. En el celular el mapa es chico: con un solo camino no
-          van (la respuesta está justo arriba del mapa y el cartel taparía el destino y el agua) y con dos caminos solo
-          dicen "Camino 1" / "Camino 2"; el estado con ícono y palabra está en la respuesta.
-          Con dos caminos, el cartel del camino tapado va abajo del camino: arriba choca con el otro cartel y el charco. */}
+      {/* Carteles, uno por camino. En el celular el mapa es chico: con un solo camino no van (la respuesta está justo
+          arriba del mapa y el cartel taparía el destino y el agua) y con dos caminos solo dicen "Camino 1" / "Camino 2";
+          el estado con ícono y palabra está en la respuesta.
+          Con dos caminos, el cartel del camino tapado va abajo del camino: arriba choca con el otro cartel y el charco.
+          Con un solo camino, el ancla está antes del tramo único y el cartel va al costado (derecha o izquierda, el lado que
+          elige generar_rutas.py): así no tapa el tramo que muestra que no hay otro camino. */}
       <>
         {caminos.map((c, i) => {
           const tapado = tapados[i];
-          const abajo = caminos.length > 1 && tapado;
+          const solo = caminos.length === 1;
+          const abajo = !solo && tapado;
+          const lado = c.cartel_lado ?? "right";
+          const direccion = solo ? lado : abajo ? "bottom" : "top";
+          const desplazamiento: [number, number] = solo ? [lado === "right" ? 8 : -8, 0] : abajo ? [0, 8] : [0, -8];
+          const orden = solo ? (lado === "right" ? "flex-row-reverse" : "flex-row") : abajo ? "flex-col-reverse" : "flex-col";
           return (
             <CircleMarker
               pane="carteles"
@@ -396,18 +472,18 @@ export default function MapaDemo({
               center={c.ancla}
               radius={4}
               interactive={false}
-              pathOptions={{ color: NEGRO, weight: 2, fillColor: "#ffffff", fillOpacity: 1 }}
+              pathOptions={ESTILO.ancla}
             >
               <Tooltip
                 permanent
-                direction={abajo ? "bottom" : "top"}
-                offset={abajo ? [0, 8] : [0, -8]}
+                direction={direccion}
+                offset={desplazamiento}
                 opacity={1}
-                className={`${s.cartel} ${caminos.length === 1 ? s.cartelSolo : ""}`}
+                className={`${s.cartel} ${solo ? s.cartelSolo : ""}`}
                 pane="tooltipPane"
               >
-                <div className={`flex items-center ${abajo ? "flex-col-reverse" : "flex-col"}`}>
-                  <div className="flex items-center gap-2.5 rounded-full border border-white/15 bg-[#070c16]/85 px-2.5 py-0.5 shadow-[0_12px_30px_-10px_rgb(0_0_0/0.8)] backdrop-blur-md lg:rounded-2xl lg:py-1.5 lg:pl-3 lg:pr-1.5">
+                <div className={`flex items-center ${orden}`}>
+                  <div className="flex items-center gap-2.5 rounded-full border border-white/15 bg-[#070c16]/85 px-2.5 py-0.5 shadow-[0_12px_30px_-10px_rgb(0_0_0/0.8)] backdrop-blur-md opaco:bg-[#070c16] lg:py-1 lg:pl-3.5 lg:pr-1">
                     <span className="text-xs font-medium text-ink-2">
                       {T4.mapa.cartel(c.n)}
                       <span className="hidden lg:inline">{T4.mapa.cartelKm(c.km)}</span>
@@ -416,7 +492,7 @@ export default function MapaDemo({
                       <Estado tono={tapado ? "peligro" : "ok"} />
                     </span>
                   </div>
-                  <span aria-hidden className="h-2.5 w-px bg-white/50" />
+                  <span aria-hidden className={solo ? "h-px w-2.5 bg-white/50" : "h-2.5 w-px bg-white/50"} />
                 </div>
               </Tooltip>
             </CircleMarker>

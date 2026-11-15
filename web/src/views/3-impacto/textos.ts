@@ -74,10 +74,12 @@ export const T3 = {
     {
       clave: "logistica",
       etiqueta: "Logística",
-      dato: "Más de 15 localidades",
+      dato: "19 localidades",
+      /** En el celular el complemento no va: esto queda para que el dato se entienda solo. */
+      corto: "con caminos intransitables",
       complemento: "del Chaco con caminos intransitables tras las últimas lluvias",
       fuente: {
-        texto: "Policía del Chaco, en CharataChaco",
+        texto: "Autoridades, en CharataChaco",
         fecha: "14/11/2026",
         iso: "2026-11-14",
         url: CHARATA,

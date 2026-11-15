@@ -122,7 +122,8 @@ function elegirInicio(ahoraMs: number, mira: { lat: number; lon: number }, aspec
   const derecha = new THREE.Vector3().crossVectors(arriba, m);
   const sm = aVector(latLonAEscena(SAN_MARTIN.lat, SAN_MARTIN.lon)).normalize();
 
-  const N = 200;
+  // 100 muestras por vuelta (una por minuto): 800 propagaciones al montar, la mitad que antes.
+  const N = 100;
   const total = N * 8;
   const paso = (PERIODO_MIN * 60_000) / N;
   // Por muestra: si se ve (delante, sin taparse, lejos del Chaco) y dónde cae en pantalla.
@@ -166,6 +167,7 @@ function elegirInicio(ahoraMs: number, mira: { lat: number; lon: number }, aspec
         Math.abs(sx) < 0.65 * Math.max(1, aspecto) && sy > -0.75 && sy < 0.62 && !sobreRecuadro(sx, sy);
 
   const minimo = Math.round(N * 0.18); // ~9 s reales a la vista con el tiempo acelerado
+  const adentro = Math.max(2, Math.round(N * 0.015));
   for (const enCuadro of [ideal, amplio]) {
     const ve = muestras.map((x) => x.ve && enCuadro(x.sx, x.sy));
     // Cuántas muestras seguidas a la vista quedan desde cada instante.
@@ -176,7 +178,7 @@ function elegirInicio(ahoraMs: number, mira: { lat: number; lon: number }, aspec
       if (!ve[i]) continue;
       if (i === 0 || !ve[i - 1]) inicioTramo = i;
       // Unas muestras adentro del tramo, para que no arranque justo entrando al encuadre.
-      if (i - inicioTramo >= 3 && tramo[i] >= minimo) return ahoraMs + i * paso;
+      if (i - inicioTramo >= adentro && tramo[i] >= minimo) return ahoraMs + i * paso;
     }
     if (enCuadro === amplio) {
       let mejor = -1;
@@ -221,15 +223,18 @@ export default function Globo({ activo, menos }: { activo: boolean; menos: boole
     const cont = contRef.current;
     if (!cont) return;
 
+    // Celular y tablet: tope de 1,5 en la densidad de píxeles. El suavizado de bordes solo hace falta con
+    // densidad 1 (con más densidad los bordes ya se ven finos y el suavizado cuesta mucho en el celular).
+    const dpr = Math.min(window.devicePixelRatio || 1, window.innerWidth < ANCHO_LG ? 1.5 : 2);
     let renderer: THREE.WebGLRenderer;
     try {
-      renderer = new THREE.WebGLRenderer({ antialias: true, alpha: true, powerPreference: "high-performance" });
+      renderer = new THREE.WebGLRenderer({ antialias: dpr <= 1, alpha: true, powerPreference: "default" });
     } catch {
       setSinWebgl(true);
       return;
     }
     let vivo = true;
-    renderer.setPixelRatio(Math.min(window.devicePixelRatio || 1, 2));
+    renderer.setPixelRatio(dpr);
     renderer.outputColorSpace = THREE.SRGBColorSpace;
     renderer.setClearColor(0x000000, 0);
     const canvas = renderer.domElement;
@@ -530,6 +535,8 @@ export default function Globo({ activo, menos }: { activo: boolean; menos: boole
         depthWrite: false,
       }),
     );
+    // La estela siempre está sobre la órbita: no hace falta recalcular su esfera envolvente en cada cuadro.
+    estela.frustumCulled = false;
     escena.add(estela);
 
     // Tiempo de la escena: arranca cerca de "ahora", en un instante con NISAR a la vista, y corre
@@ -544,6 +551,9 @@ export default function Globo({ activo, menos }: { activo: boolean; menos: boole
     );
     let simMs = inicio;
     let orbitaDesde = -Infinity;
+    /** Instante (ms) del primer punto de posOrbita. La ventana arranca 0,3 vueltas atrás: cubre la estela. */
+    let ventanaIni = 0;
+    const VENTANA_MIN = PERIODO_MIN * 1.02;
 
     function rellenar(arr: Float32Array, desdeMs: number, minutos: number, n: number) {
       let ultimo: Vec3 | null = null;
@@ -651,20 +661,36 @@ export default function Globo({ activo, menos }: { activo: boolean; menos: boole
       else delete el.dataset.lado;
     }
 
+    /** Estela interpolada sobre la órbita ya muestreada: cero propagaciones SGP4 por cuadro. */
+    function estelaDesdeOrbita() {
+      const escalaVentana = PUNTOS_ORBITA / (VENTANA_MIN * 60_000);
+      const desde = simMs - ESTELA_MIN * 60_000;
+      for (let i = 0; i <= PUNTOS_ESTELA; i++) {
+        const ms = desde + (i / PUNTOS_ESTELA) * ESTELA_MIN * 60_000;
+        const f = THREE.MathUtils.clamp((ms - ventanaIni) * escalaVentana, 0, PUNTOS_ORBITA);
+        const j = Math.min(PUNTOS_ORBITA - 1, Math.floor(f));
+        const k = f - j;
+        for (let c = 0; c < 3; c++) {
+          posEstela[i * 3 + c] = posOrbita[j * 3 + c] * (1 - k) + posOrbita[(j + 1) * 3 + c] * k;
+        }
+      }
+    }
+
     function dibujar(ahoraReal: number) {
       const quieto = estado.current.menos;
       const fecha = new Date(simMs);
       tierra.rotation.y = giroTierra(fecha);
 
-      if (simMs - orbitaDesde > PERIODO_MIN * 60_000 * 0.5) {
+      // La órbita se propaga cada media vuelta (o si el tiempo volvió atrás, en el modo quieto).
+      if (simMs - orbitaDesde > PERIODO_MIN * 60_000 * 0.5 || simMs < orbitaDesde) {
         orbitaDesde = simMs;
-        rellenar(posOrbita, simMs - PERIODO_MIN * 60_000 * 0.1, PERIODO_MIN * 1.02, PUNTOS_ORBITA);
+        ventanaIni = simMs - PERIODO_MIN * 60_000 * 0.3;
+        rellenar(posOrbita, ventanaIni, VENTANA_MIN, PUNTOS_ORBITA);
         geoOrbita.attributes.position.needsUpdate = true;
         geoOrbita.computeBoundingSphere();
       }
-      rellenar(posEstela, simMs - ESTELA_MIN * 60_000, ESTELA_MIN, PUNTOS_ESTELA);
+      estelaDesdeOrbita();
       geoEstela.attributes.position.needsUpdate = true;
-      geoEstela.computeBoundingSphere();
 
       const e = posicionNisar(fecha);
       if (e) {
@@ -741,6 +767,8 @@ export default function Globo({ activo, menos }: { activo: boolean; menos: boole
 
     let raf = 0;
     let previo = 0;
+    /** true mientras el navegador tiene el contexto WebGL perdido. */
+    let sinContexto = false;
     function cuadro(ahora: number) {
       raf = requestAnimationFrame(cuadro);
       const dt = previo ? Math.min(0.05, (ahora - previo) / 1000) : 0;
@@ -783,7 +811,7 @@ export default function Globo({ activo, menos }: { activo: boolean; menos: boole
 
     control.current = {
       arrancar() {
-        if (raf) return;
+        if (raf || sinContexto) return;
         previo = 0;
         raf = requestAnimationFrame(cuadro);
       },
@@ -792,6 +820,7 @@ export default function Globo({ activo, menos }: { activo: boolean; menos: boole
         raf = 0;
       },
       dibujarQuieto() {
+        if (sinContexto) return;
         simMs = inicio;
         parallax.x = parallax.y = parallax.ax = parallax.ay = 0;
         mano.vTheta = mano.vPhi = 0;
@@ -922,6 +951,27 @@ export default function Globo({ activo, menos }: { activo: boolean; menos: boole
     canvas.addEventListener("pointercancel", alSoltar);
     canvas.addEventListener("lostpointercapture", alSoltar);
 
+    // Contexto WebGL perdido (volver de otra app, poca memoria): se frena el loop y se avisa.
+    // three.js vuelve a subir texturas y geometrías solo al recuperarlo; acá se retoma el dibujo.
+    function alPerderContexto(ev: Event) {
+      ev.preventDefault();
+      sinContexto = true;
+      control.current?.frenar();
+      cancelAnimationFrame(pedido);
+      pedido = 0;
+      setSinWebgl(true);
+    }
+    function alRecuperarContexto() {
+      sinContexto = false;
+      setSinWebgl(false);
+      const { activo: a, menos: m } = estado.current;
+      if (m) control.current?.dibujarQuieto();
+      else if (a) control.current?.arrancar();
+      else dibujar(performance.now());
+    }
+    canvas.addEventListener("webglcontextlost", alPerderContexto);
+    canvas.addEventListener("webglcontextrestored", alRecuperarContexto);
+
     const { activo: a0, menos: m0 } = estado.current;
     if (m0) control.current.dibujarQuieto();
     else if (a0) control.current.arrancar();
@@ -941,6 +991,8 @@ export default function Globo({ activo, menos }: { activo: boolean; menos: boole
       canvas.removeEventListener("pointerup", alSoltar);
       canvas.removeEventListener("pointercancel", alSoltar);
       canvas.removeEventListener("lostpointercapture", alSoltar);
+      canvas.removeEventListener("webglcontextlost", alPerderContexto);
+      canvas.removeEventListener("webglcontextrestored", alRecuperarContexto);
       control.current = null;
       escena.traverse((o) => {
         const m = o as THREE.Mesh;

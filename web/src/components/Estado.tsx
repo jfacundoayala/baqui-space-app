@@ -1,14 +1,16 @@
-import { Check, X, TriangleAlert, HelpCircle } from "lucide-react";
+import { Check, Droplets, X, TriangleAlert, HelpCircle } from "lucide-react";
 
 // La respuesta al usuario tiene solo 2 opciones: transitable o intransitable (pedido de Facundo, 15/11).
 // "cuidado" queda solo para avisos que no son respuestas (por ejemplo, El Niño en curso).
-export type Tono = "ok" | "cuidado" | "peligro" | "sindato";
+// "mojado" no es una respuesta: rotula lo que midió el radar (zona mojada, sección 5).
+export type Tono = "ok" | "cuidado" | "peligro" | "sindato" | "mojado";
 
 const ESTILO: Record<Tono, { icono: typeof Check; clase: string; texto: string }> = {
   ok: { icono: Check, clase: "text-ok bg-ok-bg border-ok/40", texto: "Transitable" },
   cuidado: { icono: TriangleAlert, clase: "text-warn bg-warn-bg border-warn/40", texto: "Aviso" },
   peligro: { icono: X, clase: "text-danger bg-danger-bg border-danger/40", texto: "Intransitable" },
   sindato: { icono: HelpCircle, clase: "text-nodata bg-nodata-bg border-nodata/40", texto: "Sin dato" },
+  mojado: { icono: Droplets, clase: "text-accent bg-water/15 border-accent/40", texto: "Zona mojada" },
 };
 
 /** Estado siempre con ícono + palabra, nunca solo color. */

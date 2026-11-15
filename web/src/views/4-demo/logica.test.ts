@@ -106,10 +106,32 @@ for (const d of datos.destinos) {
     prueba(`${d.nombre}: la laguna de siempre toca el camino pero no cuenta`, siContara.some((m) => m >= AGUA_SEGUIDA_MAX_M) && !caminoTapado(d.caminos[0].coords, siempre, siempre), `taparía ${siContara.join(" m / ")} m`);
   }
 }
-// En el campo casi siempre hay un solo camino: la mayoría de los destinos se alcanza por un tramo único (según OSM).
+// En el campo casi siempre hay un solo camino: la mayoría de los destinos no tiene camino alternativo según OSM
+// (tramo único de 500 m o más: si se corta ahí, no hay otra forma de llegar). Esto es de la red de caminos, no del
+// agua de hoy: Colonia Villa Jardín tampoco tiene otro camino, pero hoy no lo necesita.
 const unSolo = datos.destinos.filter((d) => d.un_solo_camino);
-prueba("la mayoría de los destinos tiene un solo camino (al menos 2)", unSolo.length >= 2 && unSolo.length * 2 > datos.destinos.length,
+prueba("la mayoría de los destinos no tiene camino alternativo (al menos 2)", unSolo.length >= 2 && unSolo.length * 2 > datos.destinos.length,
   `${unSolo.length} de ${datos.destinos.length}: ${unSolo.map((d) => d.nombre).join(", ")}`);
+// Con el agua de hoy, ¿cuántos quedan INTRANSITABLE sin otro camino? Hoy es uno solo, y es una limitación de los datos:
+// entre los lugares de OSM, Laguna El Lobo es el único con camino de tierra (surface) dentro de su tramo único, y el
+// agua solo se pone sobre tierra (ver generar_rutas.py). Esta prueba pide al menos uno y que todos los que digan
+// "no llegás" sean de un solo camino; si el equipo acepta otra regla de tierra, subir el mínimo a 2.
+const sinSalida = datos.destinos.filter((d) => resultado[d.id] === "no-llegas");
+prueba("hay al menos un destino INTRANSITABLE sin otro camino, y todos son de un solo camino",
+  sinSalida.length >= 1 && sinSalida.every((d) => d.un_solo_camino && !d.alternativa.existe),
+  `${sinSalida.length} de ${datos.destinos.length}: ${sinSalida.map((d) => d.nombre).join(", ")}`);
+// El cartel de un destino con un solo camino va antes del tramo único (no tapa el tramo que muestra que no hay otro camino).
+for (const d of unSolo) {
+  const c = d.caminos[0];
+  const puntos = muestrear(c.coords);
+  let mejor = 0;
+  puntos.forEach((p, i) => {
+    if (L.distanciaM(p, c.ancla) < L.distanciaM(puntos[mejor], c.ancla)) mejor = i;
+  });
+  const kmAncla = (mejor * L.PASO_MUESTREO_M) / 1000;
+  prueba(`${d.nombre}: el cartel va antes del tramo único`, kmAncla < d.tramo_unico_km[0] && !!c.cartel_lado,
+    `cartel en el km ${kmAncla.toFixed(1)} (${c.cartel_lado}), tramo único desde el km ${d.tramo_unico_km[0]}`);
+}
 // Orden de la lista: el que abre (llegás), el del camino 2 y después los que no tienen otro camino.
 const orden = datos.destinos.map((d) => resultado[d.id]);
 const rango: Record<LogicaTipos.Veredicto, number> = { llegas: 0, alternativo: 1, "no-llegas": 2 };

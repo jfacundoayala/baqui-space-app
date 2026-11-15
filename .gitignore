@@ -1,10 +1,36 @@
+# Dependencias y builds
 node_modules/
 .next/
 dist/
 out/
-.env
-.env.local
-*.log
-.DS_Store
+build/
+coverage/
 *.tsbuildinfo
 .vercel
+
+# Secretos: nunca al repo (sí se puede subir un .env.example sin valores)
+.env
+.env.*
+!.env.example
+*.pem
+*.key
+
+# Python (scripts de datos)
+__pycache__/
+*.py[cod]
+.venv/
+venv/
+
+# Datos pesados: se bajan de NASA Earthdata con los scripts, no van a git
+datos/
+*.h5
+*.tif
+*.tiff
+*.nc
+
+# Sistema y editores
+*.log
+.DS_Store
+Thumbs.db
+desktop.ini
+.idea/

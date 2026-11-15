@@ -1,6 +1,7 @@
 import { MapPinOff, CarFront, EyeOff, type LucideIcon } from "lucide-react";
 import Seccion from "@/components/Seccion";
 import Reveal from "@/components/Reveal";
+import Encabezado from "@/components/Encabezado";
 import Consola from "./Consola";
 import { textos } from "./textos";
 
@@ -14,44 +15,41 @@ export default function Seccion2() {
 
       <div className="mx-auto w-full max-w-6xl">
         <Reveal>
-          <header className="mb-6 max-w-4xl sm:mb-8 lg:mb-6">
-            <p className="font-mono text-xs tracking-wider text-accent">{textos.etiqueta}</p>
-            <h2 className="mt-3 text-4xl font-semibold leading-[1.05] tracking-tight text-ink sm:text-5xl">
-              {textos.titulo}
-            </h2>
-            <p className="mt-4 max-w-2xl text-base leading-relaxed text-ink-2 sm:text-lg">{textos.bajada}</p>
+          <header className="mb-3 max-w-4xl sm:mb-8 lg:mb-6">
+            <Encabezado numero={2} antetitulo={textos.etiqueta} titulo={textos.titulo} />
+            <p className="mt-2 max-w-2xl text-sm leading-relaxed text-ink-2 sm:mt-4 sm:text-lg">{textos.bajada}</p>
           </header>
         </Reveal>
 
-        <div className="grid gap-6 lg:grid-cols-12 lg:gap-8">
+        <div className="grid gap-3 sm:gap-6 lg:grid-cols-12 lg:gap-8">
           <Reveal delay={80} className="glass relative overflow-hidden rounded-3xl lg:col-span-7">
             <Consola />
           </Reveal>
 
           <div className="lg:col-span-5">
             <Reveal delay={120}>
-              <h3 className="mb-4 font-mono text-xs tracking-wider text-ink-3">{textos.dolores.titulo}</h3>
+              <h3 className="mb-2 font-mono text-xs tracking-wider text-ink-3 sm:mb-4">{textos.dolores.titulo}</h3>
             </Reveal>
-            <ol className="grid gap-3 sm:grid-cols-3 lg:grid-cols-1">
+            <ol className="grid grid-cols-3 gap-2 sm:gap-3 lg:grid-cols-1">
               {textos.dolores.lista.map((d, i) => {
                 const Icono = ICONOS_DOLOR[i];
                 return (
                   <li key={d.numero}>
                     <Reveal delay={160 + ([0, 60, 100][i] ?? 100)} className="glass relative h-full overflow-hidden rounded-2xl">
-                      <article className="h-full p-5">
-                        <div className="flex items-start gap-4 sm:flex-col sm:gap-3 lg:flex-row lg:gap-4">
-                          <span className="grid size-11 shrink-0 place-items-center rounded-xl border border-danger/30 bg-danger-bg">
-                            <Icono aria-hidden className="size-5 text-danger" strokeWidth={2} />
+                      <article className="h-full p-2.5 sm:p-5">
+                        <div className="flex flex-col items-start gap-2 sm:gap-3 lg:flex-row lg:gap-4">
+                          <span className="grid size-8 shrink-0 place-items-center rounded-lg border border-danger/30 bg-danger-bg sm:size-11 sm:rounded-xl">
+                            <Icono aria-hidden className="size-4 text-danger sm:size-5" strokeWidth={2} />
                           </span>
                           <div className="min-w-0">
-                            <p className="font-mono text-xs text-ink-3">
+                            <p className="hidden font-mono text-xs text-ink-3 sm:block">
                               <span aria-hidden>{d.numero} · </span>
                               {d.tipo}
                             </p>
-                            <h4 className="mt-1 text-lg font-semibold sm:text-base lg:text-lg leading-snug tracking-tight text-ink">
+                            <h4 className="text-xs font-semibold leading-snug tracking-tight text-ink sm:mt-1 sm:text-base lg:text-lg">
                               {d.titulo}
                             </h4>
-                            <p className="mt-1 text-sm leading-relaxed text-ink-2">{d.texto}</p>
+                            <p className="mt-1 hidden text-sm leading-relaxed text-ink-2 sm:block">{d.texto}</p>
                           </div>
                         </div>
                       </article>

@@ -3,6 +3,7 @@ import Seccion from "@/components/Seccion";
 import Estado from "@/components/Estado";
 import Fuente from "@/components/Fuente";
 import Reveal from "@/components/Reveal";
+import { Antetitulo, CLASE_H2 } from "@/components/Encabezado";
 import Lienzo, { Pulso } from "./Lienzo";
 import { T3, type ClaveRecuadro, type Fuente3 } from "./textos";
 import s from "./Seccion3.module.css";
@@ -37,10 +38,7 @@ export default function Seccion3() {
       <Lienzo>
         <div className="mx-auto w-full max-w-6xl">
           <Reveal>
-            <p className="flex items-center gap-3 font-mono text-xs tracking-[0.18em] text-warn">
-              <span aria-hidden className="h-px w-8 bg-warn/60" />
-              {T3.antetitulo}
-            </p>
+            <Antetitulo numero={3}>{T3.antetitulo}</Antetitulo>
           </Reveal>
 
           {/* Aviso grande: título a la izquierda, dos cifras en fila a la derecha. */}
@@ -65,7 +63,7 @@ export default function Seccion3() {
                     </span>
                   </div>
 
-                  <h2 className="mt-4 text-4xl font-semibold leading-[1.04] tracking-[-0.035em] text-ink sm:mt-5 sm:text-6xl">
+                  <h2 className={`mt-3 sm:mt-5 ${CLASE_H2}`}>
                     <span className={s.tituloDegrade}>{aviso.tituloResaltado}</span>
                     {aviso.tituloResto}
                   </h2>
@@ -75,8 +73,8 @@ export default function Seccion3() {
                 <div className="grid grid-cols-2 gap-px overflow-hidden rounded-2xl border border-line bg-line">
                   {aviso.datos.map((d) => (
                     <div key={d.valor} className="flex flex-col bg-bg-2/85 p-3.5 sm:p-4">
-                      <p className="text-xs leading-snug text-ink-3">{d.previo}</p>
-                      <p className="mt-1 text-3xl font-semibold tabular-nums tracking-[-0.03em] text-ink sm:text-4xl">
+                      <p className="hidden text-xs leading-snug text-ink-3 sm:block">{d.previo}</p>
+                      <p className="text-3xl sm:mt-1 font-semibold tabular-nums tracking-[-0.03em] text-ink sm:text-4xl">
                         {d.valor}
                       </p>
                       <p className="mt-1 text-sm leading-snug text-ink-2">{d.texto}</p>
@@ -92,7 +90,7 @@ export default function Seccion3() {
 
           {/* Los 4 recuadros: etiqueta, un dato corto y su fuente. */}
           <h3 className="sr-only">{T3.recuadrosTitulo}</h3>
-          <ul className="mt-4 grid grid-cols-2 gap-3 sm:mt-6 lg:grid-cols-4 lg:gap-4">
+          <ul className="mt-3 grid grid-cols-2 gap-3 sm:mt-6 lg:grid-cols-4 lg:gap-4">
             {T3.recuadros.map((r, i) => {
               const Icono = ICONOS[r.clave];
               return (
@@ -106,7 +104,8 @@ export default function Seccion3() {
                         <h4 className="text-sm font-medium text-ink-2">{r.etiqueta}</h4>
                       </div>
                       <p className="mt-2.5 text-base font-semibold leading-tight tracking-[-0.02em] text-ink sm:text-2xl">{r.dato}</p>
-                      <p className="mt-1.5 text-xs leading-snug text-ink-2 sm:text-sm">{r.complemento}</p>
+                      {"corto" in r && <p className="mt-1 text-xs leading-snug text-ink-2 sm:hidden">{r.corto}</p>}
+                      <p className="mt-1.5 hidden text-sm leading-snug text-ink-2 sm:block">{r.complemento}</p>
                       <div className="mt-auto pt-3">
                         <div className="border-t border-line pt-2.5">
                           <LineaFuente f={r.fuente} />

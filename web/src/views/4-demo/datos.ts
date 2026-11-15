@@ -31,6 +31,8 @@ export type Camino = {
   km_por_superficie_osm: { tierra: number; pavimento: number; sin_dato: number };
   /** Punto del camino donde va el cartel. */
   ancla: LatLon;
+  /** Solo en destinos con un solo camino: de qué lado del ancla va el cartel (el que no tapa el camino). */
+  cartel_lado?: "right" | "left";
   coords: LatLon[];
 };
 

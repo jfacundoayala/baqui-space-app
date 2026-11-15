@@ -50,6 +50,11 @@ DESTINO_INICIAL = DESTINOS[0][0]  # la demo abre con el destino TRANSITABLE
 # un pedazo de tierra según OSM (surface) donde poner el agua es Laguna El Lobo. Lote 20 (2,4 km de tramo único) y
 # Colonia Villa Jardín (0,6 km) tienen tramo único, pero sin dato de superficie: el agua no se puede poner ahí.
 # Campo La Aurora y Puerto El Zapallar: con todas las clases de camino tienen otros accesos.
+# Revisado otra vez (15/11): (a) cortando de a uno cada puente de tierra del grafo, el único lugar place=* que queda
+# aislado es Laguna El Lobo; (b) contar como tierra los highway=track sin surface no suma ninguno: ningún tramo único
+# de los lugares tiene tracks (Lote 16, Villa Jardín, Rincon de Luna, Laguna Gobernador y Lote 20 son todos
+# unclassified sin dato). Por eso hay un solo INTRANSITABLE: para tener dos habría que aceptar "unclassified sin
+# dato de superficie" como tierra, y eso lo decide el equipo, no el script.
 
 fw = Transformer.from_crs(4326, 32721, always_xy=True)  # UTM 21S, metros
 bw = Transformer.from_crs(32721, 4326, always_xy=True)
@@ -159,7 +164,16 @@ agua = []
 #    un bajo inundado que corta el camino entrando al paraje.
 d_, h_ = tramo_unico(P1["laguna-el-lobo"])
 ini, fin = max(tramo_de_tierra(P1["laguna-el-lobo"], d_, h_), key=lambda t: t[1] - t[0])
-P, _ = mancha(L1["laguna-el-lobo"], (ini + fin) / 2, min(55, (fin - ini) / 2 - 20), 200, 1.7, ruido=0.12)
+#    La tierra (según OSM) son solo los últimos 240 m antes del paraje: el agua va lo más lejos del paraje que se
+#    pueda sin salir de la tierra (empieza en el comienzo del tramo de tierra), así en el mapa no queda abajo del
+#    marcador del paraje y se ve que lo inundado es el camino.
+a_lobo = min(55, (fin - ini) / 2 - 20)
+P = None
+for s in range(int(ini + a_lobo + 5), int((ini + fin) / 2) + 1, 5):
+    Q, _ = mancha(L1["laguna-el-lobo"], s, a_lobo, 200, 1.7, ruido=0.12)
+    if all(G[x][y]["surf"] in TIERRA for x, y in tocados(Q)):
+        P = Q; break
+assert P is not None, "no hay lugar de tierra para el agua de Laguna El Lobo"
 agua.append(("agua-1", "agua_nueva", P))
 # 2) Siete Árboles: agua nueva sobre la RP3 bis (tertiary, surface=unpaved). Ese tramo no es paso obligado:
 #    hay desvío por otros caminos (camino 2).
@@ -246,10 +260,41 @@ def camino(k, L, p, ancla_m):
     return {"n": k, "km": round(L.length/1000, 1), "km_por_superficie_osm": stats(p),
             "ancla": [r6(al[0]), r6(al[1])], "coords": coords}
 
+# Mapa de escritorio (1440x900): 1280x558 px, con el panel de la izquierda (margen de 484 px) y 72/56 px de borde.
+MAPA_PX = (1280 - 484 - 72, 558 - 2*56)
+CARTEL_PX = (290, 48)   # cartel "Camino 1 · 34,2 km · Transitable" con su raya, en px (con margen)
+
+def ancla_cartel_solo(L, unico, extra_xy):
+    """Destino con un solo camino: el cartel va ANTES del tramo único (lo que muestra que no hay otro camino no se
+    tapa) y del lado (derecha o izquierda del ancla) donde no tapa el camino, el origen ni el destino.
+    Se estima la escala del mapa de escritorio con el encuadre del recorrido. Devuelve (metros, "right"|"left")."""
+    xs = [x for x, _ in L.coords] + [x for x, _ in extra_xy]; ys = [y for _, y in L.coords] + [y for _, y in extra_xy]
+    mpp = 1.15 * max((max(xs) - min(xs)) / MAPA_PX[0], (max(ys) - min(ys)) / MAPA_PX[1])  # metros por px (+ redondeo del zoom)
+    muestras = [L.interpolate(s) for s in range(0, int(L.length), 20)]
+    marcas = [p for p in extra_xy]
+    mejor = None
+    for s in range(int(0.15 * unico[0]), int(0.85 * unico[0]), 100):
+        a = L.interpolate(s)
+        for lado in ("right", "left"):
+            x0, x1 = (a.x + 8*mpp, a.x + CARTEL_PX[0]*mpp) if lado == "right" else (a.x - CARTEL_PX[0]*mpp, a.x - 8*mpp)
+            y0, y1 = a.y - CARTEL_PX[1]/2*mpp, a.y + CARTEL_PX[1]/2*mpp
+            if lado == "left" and (a.x - min(xs)) / mpp < CARTEL_PX[0] + 20: continue  # quedaría abajo del panel
+            dentro = sum(1 for p in muestras if x0 <= p.x <= x1 and y0 <= p.y <= y1)
+            # Origen y destino: cuentan con su nombre (unos 200 x 50 px alrededor del punto).
+            dentro += 50 * sum(1 for x, y in marcas if x0 - 100*mpp <= x <= x1 + 100*mpp and y0 - 40*mpp <= y <= y1 + 25*mpp)
+            clave = (dentro, abs(s - unico[0] / 2), lado != "right")
+            if mejor is None or clave < mejor[0]: mejor = (clave, s, lado)
+    assert mejor is not None
+    print("  cartel de un solo camino: km", round(mejor[1]/1000, 1), mejor[2], "| puntos tapados:", mejor[0][0])
+    return mejor[1], mejor[2]
+
 def ancla_cartel(L):
     """Cartel antes de la primera agua que tapa el camino (así no la tapa); si no hay agua, a un tercio.
     Si el agua está en el último 20 % del camino (llegando al paraje), el cartel va a mitad de camino entre el origen
-    y el agua, así no tapa el agua ni el nombre del destino."""
+    y el agua, así no tapa el agua ni el nombre del destino.
+    Si el destino tiene tramo único (un solo camino), el cartel va antes de ese tramo (a mitad de camino entre el
+    origen y donde empieza): el tramo único es lo que muestra que no hay otro camino y no se tiene que tapar.
+    (Ese caso lo resuelve ancla_cartel_solo.)"""
     s = 0.0; inicio = None
     while s <= L.length:
         pt = L.interpolate(s)
@@ -266,7 +311,12 @@ for did, lid, esperado in DESTINOS:
     place, nombre, lat, lon = LUGARES[lid]
     n = nodo[did]; p1 = P1[did]; La = L1[did]
     tap1 = max_seguido(La, NUEVAS, SIEMPRE)
-    caminos = [camino(1, La, p1, ancla_cartel(La))]
+    unico = tramo_unico(p1)
+    if unico[1] - unico[0] >= UN_SOLO_CAMINO_MIN_M and unico[0] > 1000:
+        s_, lado_ = ancla_cartel_solo(La, unico, [XY[o], to_m(lat, lon)])
+        caminos = [camino(1, La, p1, s_)]; caminos[0]["cartel_lado"] = lado_
+    else:
+        caminos = [camino(1, La, p1, ancla_cartel(La))]
     alternativa = {"existe": False, "motivo": "no_hace_falta", "km": None}
     if tap1 >= 50:
         try:
@@ -290,8 +340,7 @@ for did, lid, esperado in DESTINOS:
                 caminos.append(camino(2, L2, p2, (mejor[0] + mejor[1]) / 2))
         except nx.NetworkXNoPath:
             alternativa = {"existe": False, "motivo": "sin_otro_camino", "km": None}
-    unico = tramo_unico(p1)
-    v = "llegas" if tap1 < 50 else "alternativo" if alternativa["existe"] else "no-llegas"
+    v ="llegas" if tap1 < 50 else "alternativo" if alternativa["existe"] else "no-llegas"
     assert v == esperado, f"{did}: da {v}, se esperaba {esperado}"
     print(did, nombre, place, "km", round(La.length/1000, 1), "| tapado seguido camino 1:", tap1,
           "| alternativa:", alternativa, "| tramo único km:", [round(x/1000, 1) for x in unico],

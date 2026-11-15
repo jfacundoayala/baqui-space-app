@@ -5,7 +5,7 @@ import { T4 } from "./textos";
 /** Sección 4 · La demo: elegís a dónde vas y BAQUI te dice cómo está el camino hoy. */
 export default function Seccion4() {
   return (
-    <Seccion id="s4" titulo={T4.tituloSeccion} className="bg-bg max-sm:py-5">
+    <Seccion id="s4" titulo={T4.tituloSeccion} className="bg-bg overflow-clip!">
       {/* Fondo con profundidad: cielo de tormenta */}
       <div aria-hidden className="pointer-events-none absolute inset-0 -z-10">
         <div className="absolute inset-0 bg-[radial-gradient(80%_60%_at_70%_0%,rgb(47_127_209/0.16),transparent_70%)]" />
