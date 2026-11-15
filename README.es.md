@@ -180,8 +180,9 @@ baqui-space-app/
 │   ├── baqui/              Descarga, medición, clasificación, lluvia y secado
 │   ├── baqui/chequeos/     Controles que generan los números de la web
 │   ├── tests/              53 tests
+│   ├── db/                 Esquema de la base (PostgreSQL + PostGIS)
 │   └── docs/               Hipótesis física, algoritmo y reglas del estado de cada tramo
-└── docs/                   Guion del pitch y del video
+└── docs/                   Guion del pitch y del video, y escalabilidad
 ```
 
 ## 9. Real y simulado
@@ -211,9 +212,11 @@ baqui-space-app/
 |---|---|---|
 | Una escena completa de NISAR | ~1,8 GB | Medido |
 | La ventana del corredor que leemos | ~43 MB | Medido (ya funciona así) |
-| El resultado de una pasada (unos 12.000 tramos de 100 m) | menos de 1 MB | Estimado |
+| El resultado de una pasada (12.017 tramos de 100 m) | ~1,2 MB | Estimado con el esquema de la base |
 
-Más de 2.000 veces menos de lo que hay que guardar. Con unas 90 pasadas por año sobre el corredor, la base crece unos 70 a 80 MB por año. Para 100.000 km de caminos, lo que se consulta (el estado de hoy, una fila por tramo) ocupa unos 60 MB, y el historial va a un almacenamiento barato.
+Unas 1.500 veces menos de lo que hay que guardar. Con unas 91 pasadas por año sobre el corredor, la base crece unos 105 MB por año. Para 100.000 km de caminos, lo que se consulta (el estado de hoy, una fila por tramo) ocupa unos 75 MB, y el historial va a archivos comprimidos en un almacenamiento barato.
+
+Cuentas, arquitectura y esquema: [`docs/SCALABILITY.md`](docs/SCALABILITY.md) y [`analisis/db/schema.sql`](analisis/db/schema.sql) (PostgreSQL + PostGIS).
 
 Arquitectura propuesta:
 

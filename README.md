@@ -180,8 +180,9 @@ baqui-space-app/
 │   ├── baqui/              Download, measurement, classification, rainfall and drying
 │   ├── baqui/chequeos/     Checks that generate the numbers on the web
 │   ├── tests/              53 tests
+│   ├── db/                 Database schema (PostgreSQL + PostGIS)
 │   └── docs/               Physical hypothesis, algorithm and rules for the state of each segment
-└── docs/                   Pitch and video script
+└── docs/                   Pitch and video script, and scalability
 ```
 
 ## 9. Real and simulated
@@ -211,9 +212,11 @@ baqui-space-app/
 |---|---|---|
 | A full NISAR scene | ~1.8 GB | Measured |
 | The corridor window we read | ~43 MB | Measured (it already works this way) |
-| The result of one pass (about 12,000 segments of 100 m) | under 1 MB | Estimated |
+| The result of one pass (12,017 segments of 100 m) | ~1.2 MB | Estimated from the database schema |
 
-More than 2,000 times less than what would have to be stored. With about 90 passes per year over the corridor, the database grows about 70 to 80 MB per year. For 100,000 km of roads, what is queried (today's state, one row per segment) takes about 60 MB, and the history goes to cheap storage.
+About 1,500 times less to store. With about 91 passes per year over the corridor, the database grows about 105 MB per year. For 100,000 km of roads, what is queried (today's state, one row per segment) takes about 75 MB, and the history goes to compressed files in cheap storage.
+
+Numbers, architecture and schema: [`docs/SCALABILITY.md`](docs/SCALABILITY.md) and [`analisis/db/schema.sql`](analisis/db/schema.sql) (PostgreSQL + PostGIS).
 
 Proposed architecture:
 
