@@ -46,9 +46,10 @@ export default function Seccion1() {
         <Tormenta activo={visible} menos={menos} />
       </div>
 
-      {/* Globo: abajo en el celular, a la derecha en pantallas grandes. */}
+      {/* Globo: abajo en el celular, a la derecha en pantallas grandes. En el celular el lienzo mide 80svh
+          pero el globo ocupa los 56svh de abajo (Globo.tsx): arriba queda cielo para que NISAR no se corte. */}
       <div
-        className="absolute bottom-[-10svh] left-1/2 z-0 h-[56svh] w-[150vw] max-w-[1000px] -translate-x-1/2
+        className="absolute bottom-[-10svh] left-1/2 z-0 h-[80svh] w-[150vw] max-w-[1000px] -translate-x-1/2
           lg:bottom-auto lg:left-auto lg:right-[-3vw] lg:top-1/2 lg:h-[min(100svh,64vw)] lg:w-[58vw] lg:max-w-none lg:translate-x-0 lg:-translate-y-1/2"
       >
         <Globo activo={visible} menos={menos} />

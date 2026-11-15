@@ -34,9 +34,14 @@ const INCLINACION_MAX = 0.55; // rad que se puede inclinar arriba/abajo con el m
 
 // NISAR fuera de escala: radios terrestres por metro real. Con 0,03 el reflector de 12 m mide 0,36
 // radios (unas 2.000 veces su tamaño real), lo justo para que se reconozca sin tapar el globo.
+// En el celular y la tablet el globo es más chico en pantalla, así que NISAR se agranda un poco más.
 const ESCALA_M = 0.03;
-// Medio ancho aproximado del conjunto en pantalla (alas solares y reflector), en radios terrestres.
-const RADIO_SAT = 0.22;
+const ESCALA_M_CELULAR = 0.04;
+// Medio ancho aproximado del conjunto (alas solares y reflector), en metros del modelo.
+const RADIO_SAT_M = 7.3;
+// En el celular y la tablet el lienzo es más alto que el globo (Seccion1: 80svh) para que NISAR no se
+// corte arriba. El globo se encuadra en la parte de abajo, que mide lo mismo que antes (56svh).
+const FRACCION_GLOBO_CELULAR = 56 / 80;
 
 const VERT = /* glsl */ `
   varying vec3 vN;
@@ -146,18 +151,19 @@ function elegirInicio(ahoraMs: number, mira: { lat: number; lon: number }, aspec
   }
 
   // Dos criterios de encuadre: primero el ideal y, si no hay, uno más amplio.
-  // Pantalla grande: el texto está a la izquierda, así que el ideal es la mitad derecha y arriba.
+  // Pantalla grande: el texto está a la izquierda, así que el ideal es la mitad derecha; sin pegarse
+  // al borde de arriba, porque el reflector sobresale por encima del satélite.
   // Celular: el globo asoma abajo y el pie tapa su parte baja, así que cuenta la parte de arriba.
   // En pantalla grande, abajo a la derecha está el recuadro con los datos de la órbita: se evita.
   const sobreRecuadro = (sx: number, sy: number) => sx > 0.15 && sy < -0.15;
   const ideal = celular
     ? (sx: number, sy: number) => Math.abs(sx) < 0.5 && sy > 0.2 && sy < 0.65
     : (sx: number, sy: number) =>
-        sx > -0.35 && sx < 0.6 * Math.max(1, aspecto) && sy > -0.45 && sy < 0.75 && !sobreRecuadro(sx, sy);
+        sx > -0.35 && sx < 0.6 * Math.max(1, aspecto) && sy > -0.45 && sy < 0.55 && !sobreRecuadro(sx, sy);
   const amplio = celular
     ? (sx: number, sy: number) => Math.abs(sx) < 0.55 && sy > 0.15 && sy < 0.85
     : (sx: number, sy: number) =>
-        Math.abs(sx) < 0.65 * Math.max(1, aspecto) && Math.abs(sy) < 0.75 && !sobreRecuadro(sx, sy);
+        Math.abs(sx) < 0.65 * Math.max(1, aspecto) && sy > -0.75 && sy < 0.62 && !sobreRecuadro(sx, sy);
 
   const minimo = Math.round(N * 0.18); // ~9 s reales a la vista con el tiempo acelerado
   for (const enCuadro of [ideal, amplio]) {
@@ -334,7 +340,6 @@ export default function Globo({ activo, menos }: { activo: boolean; menos: boole
     const sat = new THREE.Group();
     escena.add(sat);
     const modelo = new THREE.Group();
-    modelo.scale.setScalar(ESCALA_M);
     sat.add(modelo);
     const matOro = new THREE.MeshStandardMaterial({
       color: 0xd8ad45,
@@ -471,7 +476,8 @@ export default function Globo({ activo, menos }: { activo: boolean; menos: boole
     modelo.add(reflector);
 
     // Brillo suave alrededor, centrado en el conjunto (cuerpo + reflector).
-    const centroVisual = new THREE.Vector3(0.6, 0, -5.2).multiplyScalar(ESCALA_M);
+    const CENTRO_M = new THREE.Vector3(0.6, 0, -5.2);
+    const centroVisual = new THREE.Vector3();
     const texBrillo = texturaBrillo();
     const brillo = new THREE.Sprite(
       new THREE.SpriteMaterial({
@@ -483,9 +489,16 @@ export default function Globo({ activo, menos }: { activo: boolean; menos: boole
         depthWrite: false,
       }),
     );
-    brillo.position.copy(centroVisual);
-    brillo.scale.setScalar(0.62);
     sat.add(brillo);
+    let escala = ESCALA_M;
+    function ponerEscala(e: number) {
+      escala = e;
+      modelo.scale.setScalar(e);
+      centroVisual.copy(CENTRO_M).multiplyScalar(e);
+      brillo.position.copy(centroVisual);
+      brillo.scale.setScalar(0.62 * (e / ESCALA_M));
+    }
+    ponerEscala(window.innerWidth < ANCHO_LG ? ESCALA_M_CELULAR : ESCALA_M);
 
     // Línea de la órbita completa (tenue) y estela detrás del satélite (brillante, se desvanece).
     const geoOrbita = new THREE.BufferGeometry();
@@ -525,7 +538,8 @@ export default function Globo({ activo, menos }: { activo: boolean; menos: boole
     const inicio = elegirInicio(
       Date.now(),
       celularIni ? MIRA_INICIAL_CELULAR : MIRA_INICIAL,
-      Math.max(1, cont.clientWidth) / Math.max(1, cont.clientHeight),
+      Math.max(1, cont.clientWidth) /
+        Math.max(1, cont.clientHeight * (celularIni ? FRACCION_GLOBO_CELULAR : 1)),
       celularIni,
     );
     let simMs = inicio;
@@ -591,13 +605,20 @@ export default function Globo({ activo, menos }: { activo: boolean; menos: boole
     function ajustar() {
       ancho = Math.max(1, cont!.clientWidth);
       alto = Math.max(1, cont!.clientHeight);
-      esfBase = window.innerWidth >= ANCHO_LG ? esfGrande : esfCelular;
+      const celular = window.innerWidth < ANCHO_LG;
+      esfBase = celular ? esfCelular : esfGrande;
+      ponerEscala(celular ? ESCALA_M_CELULAR : ESCALA_M);
       renderer.setSize(ancho, alto, false);
-      camara.aspect = ancho / alto;
+      // El globo se encuadra en un cuadro de "altoGlobo" pegado abajo; lo que sobra arriba es cielo
+      // para que NISAR entre entero. setViewOffset corre el encuadre sin cambiar el tamaño del globo.
+      const altoGlobo = celular ? Math.max(1, alto * FRACCION_GLOBO_CELULAR) : alto;
+      camara.aspect = ancho / altoGlobo;
+      if (altoGlobo < alto) camara.setViewOffset(ancho, altoGlobo, 0, -(alto - altoGlobo), ancho, alto);
+      else camara.clearViewOffset();
       const tanMedio = Math.tan(THREE.MathUtils.degToRad(camara.fov / 2));
       distancia = MARGEN_ENCUADRE / (tanMedio * Math.min(1, camara.aspect)) + 0.4;
       // Radianes por píxel para que la superficie del centro siga al dedo.
-      radPorPx = (2 * tanMedio * (distancia - 1)) / alto;
+      radPorPx = (2 * tanMedio * (distancia - 1)) / altoGlobo;
       camara.updateProjectionMatrix();
       bordeVisible = Math.min(ancho, window.innerWidth - cont!.getBoundingClientRect().left);
       ubicarCamara();
@@ -693,7 +714,7 @@ export default function Globo({ activo, menos }: { activo: boolean; menos: boole
         // centro del conjunto (el reflector queda lejos del cuerpo).
         sat.localToWorld(vCentro.copy(centroVisual));
         aPantalla(vCentro, pA);
-        vDer.setFromMatrixColumn(camara.matrixWorld, 0).multiplyScalar(RADIO_SAT).add(vCentro);
+        vDer.setFromMatrixColumn(camara.matrixWorld, 0).multiplyScalar(RADIO_SAT_M * escala).add(vCentro);
         aPantalla(vDer, pB);
         const medio = Math.hypot(pB.x - pA.x, pB.y - pA.y) + 6;
         const izq = pA.x + medio + 80 > bordeVisible;
