@@ -1,0 +1,33 @@
+import { Check, X, TriangleAlert, HelpCircle } from "lucide-react";
+
+export type Tono = "ok" | "cuidado" | "peligro" | "sindato";
+
+const ESTILO: Record<Tono, { icono: typeof Check; clase: string; texto: string }> = {
+  ok: { icono: Check, clase: "text-ok bg-ok-bg border-ok/40", texto: "Transitable" },
+  cuidado: { icono: TriangleAlert, clase: "text-warn bg-warn-bg border-warn/40", texto: "Con cuidado" },
+  peligro: { icono: X, clase: "text-danger bg-danger-bg border-danger/40", texto: "Intransitable" },
+  sindato: { icono: HelpCircle, clase: "text-nodata bg-nodata-bg border-nodata/40", texto: "Sin dato" },
+};
+
+/** Estado siempre con ícono + palabra, nunca solo color. */
+export default function Estado({
+  tono,
+  texto,
+  grande = false,
+}: {
+  tono: Tono;
+  texto?: string;
+  grande?: boolean;
+}) {
+  const { icono: Icono, clase, texto: porDefecto } = ESTILO[tono];
+  return (
+    <span
+      className={`inline-flex items-center gap-2 rounded-full border font-semibold ${clase} ${
+        grande ? "px-5 py-2.5 text-lg tracking-wide" : "px-3 py-1 text-sm"
+      }`}
+    >
+      <Icono aria-hidden className={grande ? "size-5" : "size-4"} strokeWidth={2.5} />
+      {texto ?? porDefecto}
+    </span>
+  );
+}

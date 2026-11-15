@@ -1,0 +1,30 @@
+{
+  "_fuente": "Calculado con datos/nisar/tramos_20261011_161A164.geojson (pipeline Python de Baqui). Real, no simulado.",
+  "radar": {
+    "satelite": "NISAR (NASA-ISRO)",
+    "banda": "L",
+    "orbita": "161 ascendente",
+    "frame": "164",
+    "pasada": "11/10/2026",
+    "referencia_seca": "29/09/2026",
+    "archivo": "NISAR_L2_PR_GCOV_032_161_A_164_2005_DHDH_A_20261011T095615_20261011T095650_P05023_N_F_J_001",
+    "archivo_referencia": "NISAR_L2_PR_GCOV_031_161_A_164_2005_DHDH_A_20260929T095615_20260929T095650_P05023_N_F_J_001",
+    "verificar_url": "https://search.asf.alaska.edu/"
+  },
+  "red": {
+    "km_total": 1231.0,
+    "tramos_total": 1387,
+    "km": { "intransitable": 23.0, "con_barro": 714.8, "transitable": 360.8, "sin_dato": 132.4 },
+    "tramos": { "intransitable": 23, "con_barro": 760, "transitable": 393, "sin_dato": 211 }
+  },
+  "eco": {
+    "camino_1_db": 3.4,
+    "zona_db": 1.1,
+    "texto": "El eco del radar subió 3,4 dB en el camino 1 entre el 29/09 y el 11/10: suelo empapado."
+  },
+  "secado": {
+    "media_vida_dias": 5.7,
+    "pasadas_usadas": 4,
+    "texto": "Si no llueve, el barro baja a la mitad en 5,7 días. Lo medimos con 4 pasadas de NISAR."
+  }
+}
