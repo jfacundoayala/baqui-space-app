@@ -24,8 +24,9 @@ BAQUI responde una sola pregunta: **¿el camino rural está transitable después
 9. [Real y simulado](#9-real-y-simulado)
 10. [Límites](#10-límites)
 11. [Camino a producción y escala](#11-camino-a-producción-y-escala)
-12. [Uso de IA](#12-uso-de-ia)
-13. [Créditos y licencia](#13-créditos-y-licencia)
+12. [Hoja de ruta](#12-hoja-de-ruta)
+13. [Uso de IA](#13-uso-de-ia)
+14. [Créditos y licencia](#14-créditos-y-licencia)
 
 ---
 
@@ -190,7 +191,43 @@ flowchart LR
 
 Cada lectura guarda el ID del archivo de NASA, así cualquiera puede rehacer el cálculo.
 
-## 12. Uso de IA
+## 12. Hoja de ruta
+
+```mermaid
+flowchart LR
+    E1["Etapa 1 · MVP<br/>un corredor, una medición real<br/>Estado y ONG"] --> E2["Etapa 2 · Más superficie<br/>datos al día, defectos corregidos"]
+    E2 --> E3["Etapa 3 · Para todos<br/>más regiones, productores<br/>y gente del campo"]
+```
+
+### Etapa 1 · MVP (hecha, Space Apps 2026)
+
+- Medición real de NISAR sobre **1.201,7 km** de caminos rurales del corredor de General San Martín (Chaco): **+1,35 dB**, zona mojada.
+- La hipótesis física probada en una comparación (pasada después de la lluvia contra una de referencia de la misma órbita).
+- Web con la demo "¿Llegás hoy?" sobre caminos reales (agua simulada), verificable gratis en ASF Vertex.
+- Algoritmo programado: estado por tramo, lluvia desde la pasada (IMERG) y secado. 53 tests.
+- Público: organismos del Estado y ONG.
+
+### Etapa 2 · Más superficie, datos al día y defectos corregidos
+
+- **Más superficie:** del corredor a toda la provincia del Chaco y después al NEA.
+- **Datos al día, solos:** un aviso diario busca pasadas nuevas de NISAR y las procesa sin intervención (arquitectura de la [sección 11](#11-camino-a-producción-y-escala)). La lluvia (IMERG) y la humedad (SMAP) actualizan el estado todos los días entre pasadas.
+- **Más pasadas:** sumar SAOCOM (radar argentino de CONAE, banda L como NISAR) y Sentinel-1 / OPERA para tener un dato del camino más seguido, y CYGNSS (NASA) para saber casi a diario si la zona se mojó.
+- **Defectos a corregir** (ver [Límites](#10-límites)):
+  - Calibrar el estado por tramo y el secado con muchas pasadas, no con una.
+  - Validar en el terreno con Vialidad, Protección Civil y productores: fotos del camino el mismo día de la pasada.
+  - Medir tramo por tramo (cada 100 m) y separar mejor el camino del campo, usando las dos polarizaciones (HH y HV).
+  - Bajo el monte: confirmar el agua con otras fuentes.
+  - Reemplazar el agua simulada de la demo por la medición real.
+- **Web en inglés y en español.**
+
+### Etapa 3 · Más regiones y más gente
+
+- **Más superficie:** el resto de Argentina y otros países con caminos de tierra y temporadas de lluvia. NISAR cubre todo el planeta.
+- **Más público:** productores rurales, trabajadores del campo, transportistas, escuelas rurales y cualquier persona que tenga que salir por un camino de tierra.
+- **Donde la gente ya está:** consulta y avisos por WhatsApp ("¿llego hoy a…?"), un mapa público y una API para Vialidad, Protección Civil y las ONG.
+- **La meta:** que no se pierda producción, plata ni tiempo, y que las ambulancias y las donaciones lleguen a tiempo. Para comprobar que se cumple, medimos cuántas respuestas acierta BAQUI contra lo que se ve en el terreno, y cuánto tiempo ahorran los despachos.
+
+## 13. Uso de IA
 
 Las reglas de Space Apps 2026 piden contar cómo usamos la IA.
 
@@ -204,7 +241,7 @@ Las reglas de Space Apps 2026 piden contar cómo usamos la IA.
 
 **Qué no sale de la IA:** los números (salen de correr nuestros scripts sobre datos reales de NASA), la imagen de la Tierra (NASA Blue Marble), la foto del pie de página (foto real de Wikimedia Commons) y los caminos (OpenStreetMap). No hay imágenes generadas con IA.
 
-## 13. Créditos y licencia
+## 14. Créditos y licencia
 
 - **Código:** licencia [MIT](LICENSE).
 - **Datos:** NASA (NISAR con ISRO, IMERG, OPERA, SMAP, Blue Marble), datos públicos. Copernicus DEM GLO-30 de la ESA.

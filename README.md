@@ -24,8 +24,9 @@ BAQUI answers a single question: **is the rural road passable after the rain?** 
 9. [Real and simulated](#9-real-and-simulated)
 10. [Limits](#10-limits)
 11. [Path to production and scale](#11-path-to-production-and-scale)
-12. [Use of AI](#12-use-of-ai)
-13. [Credits and license](#13-credits-and-license)
+12. [Roadmap](#12-roadmap)
+13. [Use of AI](#13-use-of-ai)
+14. [Credits and license](#14-credits-and-license)
 
 ---
 
@@ -190,7 +191,43 @@ flowchart LR
 
 Each reading stores the ID of the NASA file, so anyone can redo the calculation.
 
-## 12. Use of AI
+## 12. Roadmap
+
+```mermaid
+flowchart LR
+    E1["Stage 1 · MVP<br/>one corridor, one real measurement<br/>State agencies and NGOs"] --> E2["Stage 2 · More area<br/>up-to-date data, defects fixed"]
+    E2 --> E3["Stage 3 · For everyone<br/>more regions, farmers<br/>and rural workers"]
+```
+
+### Stage 1 · MVP (done, Space Apps 2026)
+
+- Real NISAR measurement over **1,201.7 km** of rural roads in the General San Martín corridor (Chaco): **+1.35 dB**, wet area.
+- The physical hypothesis tested in one comparison (a pass after the rain against a reference pass from the same orbit).
+- Web with the "Will you get there today?" demo on real roads (simulated water), verifiable for free in ASF Vertex.
+- Algorithm programmed: state per segment, rainfall since the pass (IMERG) and drying. 53 tests.
+- Audience: State agencies and NGOs.
+
+### Stage 2 · More area, up-to-date data and defects fixed
+
+- **More area:** from the corridor to the whole province of Chaco, then to Northeast Argentina.
+- **Data kept up to date automatically:** a daily check finds new NISAR passes and processes them with no manual step (architecture in [section 11](#11-path-to-production-and-scale)). Rainfall (IMERG) and soil moisture (SMAP) update the state every day between passes.
+- **More passes:** add SAOCOM (Argentina's CONAE radar, L-band like NISAR) and Sentinel-1 / OPERA to get road data more often, and CYGNSS (NASA) to know almost daily whether the area got wet.
+- **Defects to fix** (see [Limits](#10-limits)):
+  - Calibrate the state per segment and the drying with many passes, not one.
+  - Validate on the ground with the roads agency, Civil Protection and farmers: photos of the road on the day of the pass.
+  - Measure segment by segment (every 100 m) and better separate the road from the field, using both polarizations (HH and HV).
+  - Under forest: confirm water with other sources.
+  - Replace the simulated water in the demo with the real measurement.
+- **Web in English and Spanish.**
+
+### Stage 3 · More regions and more people
+
+- **More area:** the rest of Argentina and other countries with dirt roads and rainy seasons. NISAR covers the whole planet.
+- **Wider audience:** farmers, rural workers, truck drivers, rural schools and anyone who has to travel on a dirt road.
+- **Where people already are:** queries and alerts over WhatsApp ("can I get to … today?"), a public map and an API for the roads agency, Civil Protection and NGOs.
+- **The goal:** no lost production, money or time, and ambulances and donations that arrive on time. To check that it works, we measure how many BAQUI answers match what is seen on the ground, and how much time dispatches save.
+
+## 13. Use of AI
 
 The Space Apps 2026 rules ask us to state how we used AI.
 
@@ -204,7 +241,7 @@ The Space Apps 2026 rules ask us to state how we used AI.
 
 **What does not come from AI:** the numbers (they come from running our scripts on real NASA data), the image of the Earth (NASA Blue Marble), the footer photo (a real photo from Wikimedia Commons) and the roads (OpenStreetMap). There are no AI-generated images.
 
-## 13. Credits and license
+## 14. Credits and license
 
 - **Code:** [MIT](LICENSE) license.
 - **Data:** NASA (NISAR with ISRO, IMERG, OPERA, SMAP, Blue Marble), public data. Copernicus DEM GLO-30 from ESA.
