@@ -95,6 +95,7 @@ El detalle está en [`analisis/docs/HIPOTESIS-FISICA.md`](analisis/docs/HIPOTESI
 | **NISAR L2 GCOV** (banda L, HH y HV) | NASA-ISRO, vía ASF DAAC | Eco del radar sobre los caminos | **Medido** (números de la sección 5) |
 | **IMERG** (lluvia diaria) | NASA GPM | Lluvia desde la pasada, por tramo | Bajado y usado en el algoritmo |
 | **OPERA DSWx-S1** (agua en superficie) | NASA JPL | Control: dónde hay agua a la vista | Usado en los chequeos |
+| **Sentinel-1** (radar banda C, vía OPERA RTC) | ESA, procesado por NASA JPL | Segundo radar: ver si confirma lo de NISAR | Comparado: marcó los mismos caminos |
 | **SMAP** (humedad del suelo) | NASA | Humedad de la zona | Bajado y usado como respaldo |
 | **NASADEM** (altura del terreno, 30 m) | NASA | Si el tramo está en un bajo o en una loma | Fuente por defecto en el script de descarga |
 | **Blue Marble** | NASA | Imagen de la Tierra en el globo 3D | En la web |
@@ -107,7 +108,7 @@ El detalle está en [`analisis/docs/HIPOTESIS-FISICA.md`](analisis/docs/HIPOTESI
 |---|---|---|
 | **SAOCOM 1A y 1B** (banda L, 23,5 cm, 4 polarizaciones, hasta 10 m) | CONAE (Argentina) | Más pasadas en la misma banda que NISAR (cada 8 días con los dos satélites) y 4 polarizaciones para separar agua, suelo mojado y vegetación, sobre todo bajo el monte. Archivo gratis para el territorio argentino. Participa de la Carta Internacional de Desastres |
 | **CYGNSS** (humedad del suelo y agua en superficie) | NASA | Humedad cada 6 horas (grilla de 9 km) y máscara de agua diaria (1 km): dice casi a diario si la zona se mojó entre pasadas de radar |
-| **Sentinel-1 / OPERA RTC** (banda C) | ESA / NASA JPL | Más pasadas de radar para tener el dato del camino más seguido |
+| **Sentinel-1 en la respuesta diaria** (banda C) | ESA / NASA JPL | Hoy es control; calibrado con NISAR, suma pasadas para tener el dato del camino más seguido |
 
 Todos los datos son públicos y gratis. No están en el repo porque pesan varios GB: se bajan con los scripts de [`analisis/`](analisis/README.md).
 
@@ -132,6 +133,7 @@ Corredor de General San Martín (Chaco), órbita 161 ascendente, frame 164. Una 
 | **NISAR, órbita 060 ascendente** | Eco del eje +1,08 dB, 7 días después de la lluvia | Sí: otra geometría ve lo mismo |
 | **NISAR, órbita 111 descendente** | Eco del eje +0,77 dB, 10 días después de la lluvia | Sí: sube menos porque el suelo se va secando |
 | **OPERA** (agua en superficie, NASA) | 0 % de agua nueva sobre el eje de los caminos | Sí: mojado, no bajo agua |
+| **Sentinel-1** (otro radar, banda C) | Eco +1,07 dB en la zona de San Martín después de la lluvia; los 3 caminos donde más subió (+4,5, +3,2 y +2,9 dB) también resaltan en NISAR (+3,4, +1,9 y +3,0 dB) | Sí: dos radares distintos marcan los mismos caminos |
 | **Campo lejos de los caminos** | +0,17 dB | Sí: donde llovió menos, el eco casi no cambia |
 
 **Conclusión:** el radar ve la **zona mojada**. Cada número tiene anotado su archivo de origen en [`web/src/data/resultados.json`](web/src/data/resultados.json) (campos `_fuente`). Cualquiera lo puede verificar gratis en [ASF Vertex](https://search.asf.alaska.edu/) con el ID del archivo que da la web.

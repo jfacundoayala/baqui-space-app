@@ -95,6 +95,7 @@ The details are in [`analisis/docs/HIPOTESIS-FISICA.md`](analisis/docs/HIPOTESIS
 | **NISAR L2 GCOV** (L-band, HH and HV) | NASA-ISRO, via ASF DAAC | Radar echo over the roads | **Measured** (numbers in section 5) |
 | **IMERG** (daily rainfall) | NASA GPM | Rainfall since the pass, per segment | Downloaded and used in the algorithm |
 | **OPERA DSWx-S1** (surface water) | NASA JPL | Control: where water is visible | Used in the checks |
+| **Sentinel-1** (C-band radar, via OPERA RTC) | ESA, processed by NASA JPL | Second radar: does it confirm NISAR? | Compared: it flagged the same roads |
 | **SMAP** (soil moisture) | NASA | Moisture of the area | Downloaded and used as corroboration |
 | **NASADEM** (terrain height, 30 m) | NASA | Whether the segment lies in a low spot or on a rise | Default source in the download script |
 | **Blue Marble** | NASA | Image of the Earth on the 3D globe | On the web |
@@ -107,7 +108,7 @@ The details are in [`analisis/docs/HIPOTESIS-FISICA.md`](analisis/docs/HIPOTESIS
 |---|---|---|
 | **SAOCOM 1A and 1B** (L-band, 23.5 cm, 4 polarizations, down to 10 m) | CONAE (Argentina) | More passes in the same band as NISAR (every 8 days with both satellites) and 4 polarizations to separate water, wet soil and vegetation, especially under forest. Free archive for Argentine territory. Part of the International Charter on Space and Major Disasters |
 | **CYGNSS** (soil moisture and surface water) | NASA | Soil moisture every 6 hours (9 km grid) and a daily water mask (1 km): tells almost daily whether the area got wet between radar passes |
-| **Sentinel-1 / OPERA RTC** (C-band) | ESA / NASA JPL | More radar passes to get road data more often |
+| **Sentinel-1 in the daily answer** (C-band) | ESA / NASA JPL | Today it is a control; once calibrated against NISAR, it adds passes to get road data more often |
 
 All data are public and free. They are not in the repo because they weigh several GB: they are downloaded with the scripts in [`analisis/`](analisis/README.md).
 
@@ -132,6 +133,7 @@ General San Martín corridor (Chaco), ascending orbit 161, frame 164. A pass aft
 | **NISAR, ascending orbit 060** | Centerline echo +1.08 dB, 7 days after the rain | Yes: another geometry sees the same |
 | **NISAR, descending orbit 111** | Centerline echo +0.77 dB, 10 days after the rain | Yes: it rises less because the soil is drying |
 | **OPERA** (surface water, NASA) | 0% new water on the road centerline | Yes: wet, not under water |
+| **Sentinel-1** (another radar, C-band) | Echo +1.07 dB over the San Martín area after the rain; the 3 roads where it rose most (+4.5, +3.2 and +2.9 dB) also stand out in NISAR (+3.4, +1.9 and +3.0 dB) | Yes: two different radars flag the same roads |
 | **Field far from the roads** | +0.17 dB | Yes: where it rained less, the echo barely changes |
 
 **Conclusion:** the radar sees the **wet area**. Each number has its source file noted in [`web/src/data/resultados.json`](web/src/data/resultados.json) (`_fuente` fields). Anyone can verify it for free in [ASF Vertex](https://search.asf.alaska.edu/) with the file ID given by the web.
