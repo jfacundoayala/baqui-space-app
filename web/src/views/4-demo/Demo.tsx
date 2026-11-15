@@ -1,9 +1,8 @@
 "use client";
 // La demo: una consulta de hoy. [Gral. San Martín] → [¿Hacia dónde?] → respuesta.
 // La consulta corre sola al elegir destino (abre con el destino TRANSITABLE); "Consultar" la vuelve a correr (el agua aparece de nuevo).
-import { Ban, Check, FlaskConical, Radar, X } from "lucide-react";
+import { Check, FlaskConical, Radar, X } from "lucide-react";
 import { useEffect, useMemo, useRef, useState, type ComponentProps, type ComponentType, type RefObject } from "react";
-import Estado from "@/components/Estado";
 import Fuente from "@/components/Fuente";
 import Reveal from "@/components/Reveal";
 import Encabezado from "@/components/Encabezado";
@@ -142,14 +141,17 @@ export default function Demo() {
         <Encabezado numero={4} antetitulo={T4.etiqueta} titulo={T4.titulo} />
         <div className="hidden sm:block">
           <p className="text-base leading-snug text-ink-2 sm:text-lg">{T4.bajada}</p>
-          <p className="mt-1.5 hidden text-sm text-ink-3 lg:block">{T4.bajadaNota}</p>
+          <p className="mt-1.5 hidden text-sm text-ink-3 lg:block">
+            {T4.bajadaNota} {T4.regla}
+          </p>
         </div>
       </Reveal>
 
       <Reveal delay={120}>
         <div className="mt-3 flex flex-col gap-2 sm:mt-6 sm:gap-3 lg:relative lg:mt-7 lg:block lg:h-[min(62svh,720px)] lg:min-h-[548px]">
           {/* Consulta: desde → hacia + Consultar */}
-          <div className="relative z-20 order-1 flex flex-col gap-2 lg:absolute lg:left-4 lg:top-4 lg:w-[432px]">
+          {/* En escritorio: una barra centrada arriba del mapa, buscador y Consultar en la misma fila (pedido de Facundo, 15/11). */}
+          <div className="relative z-20 order-1 flex flex-col gap-2 lg:absolute lg:left-1/2 lg:top-4 lg:grid lg:-translate-x-1/2 lg:grid-cols-[456px_auto]">
             <Buscador destinos={DATOS.destinos} elegido={destino} onElegir={elegir} />
             <button
               type="button"
@@ -162,8 +164,8 @@ export default function Demo() {
             </button>
           </div>
 
-          {/* Respuesta. En el celular: arriba del mapa; el detalle va en escritorio. */}
-          <div className={`contents lg:absolute lg:bottom-4 lg:left-4 lg:z-10 lg:block lg:w-[432px] ${s.panel} ${s.contenedor}`}>
+          {/* Respuesta. En el celular: arriba del mapa. En escritorio: centrada abajo, sobre el mapa. */}
+          <div className={`contents lg:absolute lg:bottom-4 lg:left-1/2 lg:z-10 lg:block lg:w-[456px] lg:-translate-x-1/2 ${s.panel} ${s.contenedor}`}>
             <div className={`order-2 ${s.tarjeta} max-lg:flex max-lg:flex-col max-lg:justify-center max-sm:min-h-[194px] sm:max-lg:min-h-[206px]`}>
               {/* Respuesta centrada, como el buscador de arriba (pedido de Facundo, 15/11). */}
               <div role="status" aria-live="polite" aria-atomic="true" className="text-center">
@@ -203,47 +205,13 @@ export default function Demo() {
               </div>
               {sinOtro && <p className="mt-1.5 text-center text-sm text-ink-2">{T4.unSoloCamino}</p>}
             </div>
-
-            <div className={`order-4 hidden lg:mt-3 lg:block ${s.tarjeta}`}>
-              <ul aria-label={T4.caminos.lista} className="divide-y divide-line border-y border-line">
-                {destino.caminos.map((c, i) => {
-                  const porAca = calculo.recomendado?.n === c.n;
-                  return (
-                    <li key={c.n} className="flex items-center justify-between gap-3 py-2">
-                      <span className="flex min-w-0 flex-wrap items-baseline gap-x-2 gap-y-1">
-                        <span className={`text-sm font-semibold ${porAca ? "text-ink" : "text-ink-2"}`}>
-                          {T4.caminos.nombre(c.n)}
-                        </span>
-                        <span className="text-xs text-ink-3">{T4.caminos.km(c.km)}</span>
-                        {porAca && (
-                          <span className="rounded-full border border-white/25 px-2 py-px text-xs font-medium text-ink">
-                            {T4.caminos.porAca}
-                          </span>
-                        )}
-                      </span>
-                      <Estado tono={calculo.tapados[i] ? "peligro" : "ok"} />
-                    </li>
-                  );
-                })}
-                {sinOtro && (
-                  <li className="flex items-center justify-between gap-3 py-2">
-                    <span className="text-sm font-semibold text-ink-2">{T4.caminos.otro}</span>
-                    <span className="inline-flex items-center gap-2 rounded-full border border-nodata/40 bg-nodata-bg px-3 py-1 text-sm font-semibold text-nodata">
-                      <Ban aria-hidden className="size-4" strokeWidth={2.5} />
-                      {T4.caminos.noHay}
-                    </span>
-                  </li>
-                )}
-              </ul>
-              <p className="mt-2.5 text-xs leading-relaxed text-ink-3">{T4.regla}</p>
-            </div>
           </div>
 
           {/* Mapa */}
           <figure
             aria-label={T4.mapa.region}
             data-hoy={vista ? "si" : "no"}
-            className={`${s.mapa} relative isolate z-0 order-3 m-0 h-[31svh] min-h-[236px] overflow-hidden rounded-3xl border border-line shadow-[0_30px_80px_-30px_rgb(20_60_120/0.55)] sm:h-[38svh] lg:absolute lg:inset-0 lg:h-auto lg:min-h-0`}
+            className={`${s.mapa} relative isolate z-0 order-3 m-0 h-[29svh] min-h-[220px] overflow-hidden rounded-3xl border border-line shadow-[0_30px_80px_-30px_rgb(20_60_120/0.55)] sm:h-[38svh] lg:absolute lg:inset-0 lg:h-auto lg:min-h-0`}
           >
             {/* Mientras carga el mapa se ve esto; el mapa lo tapa al cargar. */}
             <div aria-hidden className="absolute inset-0 -z-10 flex items-center justify-center text-sm text-ink-3">

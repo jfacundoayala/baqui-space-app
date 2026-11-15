@@ -1,7 +1,7 @@
 "use client";
 // Los dos recuadros tipo buscador: [Gral. San Martín] → [¿Hacia dónde?]. En el celular, sin la flecha. En una sola fila, también en 375 px.
-// El origen va siempre entero; si no entra, el que se corta es el nombre del destino (solo en el celular: en
-// escritorio el panel mide 432 px, así entra entero el nombre más largo, "Paraje Laguna El Lobo").
+// El origen va siempre entero. En el celular el nombre del destino puede ir en 2 renglones (alto reservado, así
+// el mapa no salta); en escritorio el panel mide 456 px y entra entero en uno, "Paraje Laguna El Lobo" incluido.
 import { ArrowRight, Check, ChevronDown, MapPin } from "lucide-react";
 import { useEffect, useId, useRef, useState } from "react";
 import type { Destino } from "./datos";
@@ -65,7 +65,8 @@ export default function Buscador({
       className="glass relative z-30 grid grid-cols-[auto_minmax(0,1fr)] items-stretch gap-1 sm:grid-cols-[auto_auto_minmax(0,1fr)] sm:gap-0 rounded-2xl p-1.5"
     >
       {/* Desde: fijo. No se achica: "Gral. San Martín" siempre entero; el que se corta, si hace falta, es el destino. */}
-      <div className="flex shrink-0 flex-col justify-center rounded-xl px-2 py-2 sm:px-3.5">
+      {/* Texto centrado en cada caja, igual que la respuesta (pedido de Facundo, 15/11). */}
+      <div className="flex shrink-0 flex-col items-center justify-center rounded-xl px-2 py-2 text-center sm:px-3.5">
         <span className="text-xs text-ink-3">{T4.buscador.desde}</span>
         <span className="mt-0.5 flex items-center gap-1.5 whitespace-nowrap text-sm font-medium text-ink sm:gap-2 sm:text-[15px]">
           <span aria-hidden className="size-2 shrink-0 rounded-full bg-accent shadow-[0_0_0_3px_rgb(124_196_255/0.2)]" />
@@ -87,13 +88,16 @@ export default function Buscador({
           aria-controls={idLista}
           aria-label={`${T4.buscador.abrir}. ${T4.buscador.elegido}: ${elegido.nombre}`}
           onClick={() => setAbierto((v) => !v)}
-          className="flex min-h-11 size-full min-w-0 items-center gap-2 rounded-xl bg-white/[0.07] px-2.5 py-2 text-left ring-1 ring-white/10 transition-[background-color,scale] duration-150 ease-[cubic-bezier(0.23,1,0.32,1)] hover:bg-white/[0.11] motion-safe:active:scale-[0.98] sm:px-3.5"
+          className="flex min-h-11 size-full min-w-0 items-center gap-1 rounded-xl max-sm:min-h-[70px] bg-white/[0.07] px-2 py-2 text-center ring-1 ring-white/10 transition-[background-color,scale] duration-150 ease-[cubic-bezier(0.23,1,0.32,1)] hover:bg-white/[0.11] motion-safe:active:scale-[0.98] sm:gap-2 sm:px-3.5"
         >
-          <span className="flex min-w-0 flex-1 flex-col">
+          <span aria-hidden className="size-4 shrink-0" />
+          <span className="flex min-w-0 flex-1 flex-col items-center">
             <span className="text-xs text-ink-3">{T4.buscador.placeholder}</span>
-            <span className="mt-0.5 flex min-w-0 items-center gap-1.5 text-sm font-semibold text-ink sm:text-[15px]">
-              <MapPin aria-hidden className="size-3.5 shrink-0 text-ink-2" strokeWidth={2.25} />
-              <span className="truncate">{elegido.nombre}</span>
+            <span className="mt-0.5 flex min-w-0 max-w-full items-center justify-center gap-1.5 text-sm font-semibold text-ink sm:text-[15px]">
+              <MapPin aria-hidden className="size-3.5 shrink-0 text-ink-2 max-sm:hidden" strokeWidth={2.25} />
+              <span className="truncate max-sm:line-clamp-2 max-sm:whitespace-normal max-sm:text-balance max-sm:leading-tight">
+                {elegido.nombre}
+              </span>
             </span>
           </span>
           <ChevronDown

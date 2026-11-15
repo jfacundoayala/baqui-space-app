@@ -55,15 +55,6 @@ export const T4 = {
   /** Solo cuando no hay otro camino (respuesta "no salgas"). */
   unSoloCamino: "En el campo, casi siempre hay un solo camino.",
 
-  caminos: {
-    lista: "Caminos",
-    nombre: (n: number) => `Camino ${n}`,
-    km: (valor: number) => `${km.format(valor)} km`,
-    porAca: "Por acá",
-    otro: "Otro camino",
-    noHay: "No hay",
-  },
-
   regla: "Regla: 50 m seguidos de agua nueva sobre el camino y no se pasa. Las lagunas de siempre no cuentan.",
 
   mapa: {

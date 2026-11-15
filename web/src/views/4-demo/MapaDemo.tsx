@@ -141,7 +141,8 @@ const LUGAR_ROTULO_AGUA_PX = 150;
  */
 function margenes(derecha = 0): L.FitBoundsOptions {
   return esEscritorio()
-    ? { paddingTopLeft: [484, 56], paddingBottomRight: [72, 56] }
+    ? // Escritorio: buscador centrado arriba (~85 px) y respuesta centrada abajo (hasta ~230 px): la ruta va en el medio.
+      { paddingTopLeft: [72, 108], paddingBottomRight: [72, 250] }
     : { paddingTopLeft: [28, 72], paddingBottomRight: [28 + derecha, 28] };
 }
 
