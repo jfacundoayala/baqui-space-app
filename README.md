@@ -10,7 +10,7 @@
 
 * **El desafío físico:** Durante El Niño, la nubosidad y tormentas son constantes. Los satélites ópticos tradicionales (Sentinel-2, Landsat) quedan **completamente ciegos** ante las nubes.
 * **La tecnología SAR:** El Radar de Apertura Sintética (SAR, Sentinel-1) emite pulsos de microondas que **atraviesan la cobertura nubosa día y noche**, detectando el agua acumulada sobre la calzada rural gracias a su baja retrodispersión especular.
-* **Desarrollo asociado (View 1):** Visor interactivo de caminos estilo PUNA con selector de capa óptica vs. Radar SAR y estado de transitabilidad en tiempo real.
+* **Desarrollo asociado (View 1):** Visor interactivo de caminos (diseño limpio: mapa oscuro, paneles de vidrio y estado con ícono + palabra) con selector de capa óptica vs. Radar SAR y estado de transitabilidad en tiempo real.
 
 ---
 

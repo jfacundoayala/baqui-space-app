@@ -5,7 +5,7 @@ NASA Space Apps Challenge 2026 · Track: Dancing with the SARs
 
 ## 1. ¿Qué es y qué problema resuelve? (View 1)
 * **Texto:** 'Baqui es un sistema que da información para prevenir daños frente al fenómeno de El Niño. Te dice cómo está el camino rural, para que decidas si salir sin tener que ir hasta ahí a mirar.'
-* **En pantalla:** View 1 (El visor de caminos estilo Puna con el Radar SAR atravesando las nubes y detectando el agua sobre el camino).
+* **En pantalla:** View 1 (El visor de caminos, con diseño limpio de panel de control, con el Radar SAR atravesando las nubes y detectando el agua sobre el camino).
 
 ---
 
