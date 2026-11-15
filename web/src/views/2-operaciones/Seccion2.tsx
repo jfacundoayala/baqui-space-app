@@ -1,9 +1,94 @@
+import { MapPinOff, CarFront, EyeOff, type LucideIcon } from "lucide-react";
 import Seccion from "@/components/Seccion";
+import Reveal from "@/components/Reveal";
+import Consola from "./Consola";
+import { textos } from "./textos";
 
+const ICONOS_DOLOR: LucideIcon[] = [MapPinOff, CarFront, EyeOff];
+
+/** Sección 2: quién es el cliente ideal y qué le duele hoy. */
 export default function Seccion2() {
   return (
-    <Seccion id="s2" titulo="Sección 2">
-      <p className="text-center text-ink-2">Sección 2 (en construcción)</p>
+    <Seccion id="s2" titulo={textos.seccion} className="bg-bg">
+      <Fondo />
+
+      <div className="mx-auto w-full max-w-6xl">
+        <Reveal>
+          <header className="mb-6 max-w-4xl sm:mb-8 lg:mb-6">
+            <p className="font-mono text-xs tracking-wider text-accent">{textos.etiqueta}</p>
+            <h2 className="mt-3 text-4xl font-semibold leading-[1.05] tracking-tight text-ink sm:text-5xl">
+              {textos.titulo}
+            </h2>
+            <p className="mt-4 max-w-2xl text-base leading-relaxed text-ink-2 sm:text-lg">{textos.bajada}</p>
+          </header>
+        </Reveal>
+
+        <div className="grid gap-6 lg:grid-cols-12 lg:gap-8">
+          <Reveal delay={80} className="lg:col-span-7">
+            <Consola />
+          </Reveal>
+
+          <div className="lg:col-span-5">
+            <Reveal delay={160}>
+              <h3 className="mb-4 font-mono text-xs tracking-wider text-ink-3">{textos.dolores.titulo}</h3>
+            </Reveal>
+            <ol className="grid gap-3 sm:grid-cols-3 lg:grid-cols-1">
+              {textos.dolores.lista.map((d, i) => {
+                const Icono = ICONOS_DOLOR[i];
+                return (
+                  <li key={d.numero}>
+                    <Reveal delay={220 + i * 120} className="h-full">
+                      <article className="glass group relative h-full overflow-hidden rounded-2xl p-5 transition-colors hover:bg-surface-2">
+                        <div className="flex items-start gap-4 sm:flex-col sm:gap-3 lg:flex-row lg:gap-4">
+                          <span className="grid size-11 shrink-0 place-items-center rounded-xl border border-danger/30 bg-danger-bg">
+                            <Icono aria-hidden className="size-5 text-danger" strokeWidth={2} />
+                          </span>
+                          <div className="min-w-0">
+                            <p className="font-mono text-xs text-ink-3">
+                              <span aria-hidden>{d.numero} · </span>
+                              {d.tipo}
+                            </p>
+                            <h4 className="mt-1 text-lg font-semibold sm:text-base lg:text-lg leading-snug tracking-tight text-ink">
+                              {d.titulo}
+                            </h4>
+                            <p className="mt-1 text-sm leading-relaxed text-ink-2">{d.texto}</p>
+                          </div>
+                        </div>
+                      </article>
+                    </Reveal>
+                  </li>
+                );
+              })}
+            </ol>
+          </div>
+        </div>
+      </div>
     </Seccion>
+  );
+}
+
+/** Fondo con profundidad: luz fría arriba, resplandor de alerta abajo y una grilla tenue. */
+function Fondo() {
+  return (
+    <div aria-hidden className="pointer-events-none absolute inset-0 -z-10">
+      <div
+        className="absolute inset-0"
+        style={{
+          background:
+            "radial-gradient(60% 50% at 15% 0%, rgb(124 196 255 / 0.10), transparent 70%), radial-gradient(45% 40% at 85% 95%, rgb(248 113 113 / 0.08), transparent 70%), linear-gradient(180deg, var(--bg) 0%, var(--bg-2) 100%)",
+        }}
+      />
+      <div
+        className="absolute inset-0 opacity-[0.35]"
+        style={{
+          backgroundImage:
+            "linear-gradient(rgb(255 255 255 / 0.04) 1px, transparent 1px), linear-gradient(90deg, rgb(255 255 255 / 0.04) 1px, transparent 1px)",
+          backgroundSize: "56px 56px",
+          maskImage: "radial-gradient(ellipse at 50% 40%, black 30%, transparent 75%)",
+          WebkitMaskImage: "radial-gradient(ellipse at 50% 40%, black 30%, transparent 75%)",
+        }}
+      />
+      <div className="absolute inset-x-0 top-0 h-px bg-gradient-to-r from-transparent via-line to-transparent" />
+    </div>
   );
 }

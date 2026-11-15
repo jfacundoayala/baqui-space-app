@@ -1,10 +1,12 @@
 import { Check, X, TriangleAlert, HelpCircle } from "lucide-react";
 
+// La respuesta al usuario tiene solo 2 opciones: transitable o intransitable (pedido de Facundo, 15/11).
+// "cuidado" queda solo para avisos que no son respuestas (por ejemplo, El Niño en curso).
 export type Tono = "ok" | "cuidado" | "peligro" | "sindato";
 
 const ESTILO: Record<Tono, { icono: typeof Check; clase: string; texto: string }> = {
   ok: { icono: Check, clase: "text-ok bg-ok-bg border-ok/40", texto: "Transitable" },
-  cuidado: { icono: TriangleAlert, clase: "text-warn bg-warn-bg border-warn/40", texto: "Con cuidado" },
+  cuidado: { icono: TriangleAlert, clase: "text-warn bg-warn-bg border-warn/40", texto: "Aviso" },
   peligro: { icono: X, clase: "text-danger bg-danger-bg border-danger/40", texto: "Intransitable" },
   sindato: { icono: HelpCircle, clase: "text-nodata bg-nodata-bg border-nodata/40", texto: "Sin dato" },
 };

@@ -1,0 +1,5 @@
+.next
+node_modules
+.env*
+*.tsbuildinfo
+src/views/4-demo/generar_rutas.py
