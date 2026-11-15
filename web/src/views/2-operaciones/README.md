@@ -1,17 +1,10 @@
-# INSTRUCCIONES: Desarrollador 2 (View 2 - Panel de Operaciones)
+# PUNTO 2: El Cliente Ideal y los 3 Dolores Reales (Dev 2)
 
 ## Tu Objetivo
-Crear la pantalla del **Cliente Ideal** (Protección Civil provincial, Vialidad, Cruz Roja, Cáritas). Debe ejemplificar el problema actual: tener que despachar rescates y ayuda humanitaria a ciegas.
+Desarrollar la pantalla que responde directamente al **Punto 2** del pitch:
+> *'Organismos del Estado (Protección Civil, Vialidad) y ONGs (Cáritas, Cruz Roja)'.*
 
-## Dónde trabajas
-* Tu código va aquí: web/src/views/2-operaciones/
-* Tus imágenes/iconos van en: web/public/assets-view2/
-* **Importante:** No toques las carpetas 1-visor ni 3-impacto.
-
-## Elementos Clave que debe tener tu vista:
-1. **Encabezado institucional:** 'Panel de Despacho y Contingencia - Protección Civil / Cruz Roja'.
-2. **Lista de Flota / Vehículos en Espera:**
-   - Ambulancia #04 (Puesto Sanitario Norte) -> Estado: *Pendiente de salida*.
-   - Camión de Suministros #12 (Cáritas) -> Estado: *Ruta no confirmada*.
-3. **El Bloque del Problema (Incertidumbre Actual):**
-   - Cartel de advertencia: 'ADVERTENCIA: Sin datos de transitabilidad en tiempo real. Alto riesgo de varadura o vuelco en caminos de tierra'.
+## Qué debe mostrar tu View:
+1. Consola de despacho para Protección Civil, Cruz Roja y Cáritas.
+2. Ejemplificación del problema: vehículos en espera (ambulancias y camiones con donaciones).
+3. Cartel de alerta que evidencie el dolor actual: *'ADVERTENCIA: Sin datos de transitabilidad en tiempo real. Despacho a ciegas con alto riesgo de vuelco o varadura'*.

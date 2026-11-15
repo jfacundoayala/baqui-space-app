@@ -1,19 +1,13 @@
-# INSTRUCCIONES: Desarrollador 3 (View 3 - El Niño e Impacto) y Navegación
+# PUNTO 3: El 'Why Now' / Disparador de Urgencia - EL NIÑO (Dev 3)
 
 ## Tu Objetivo
-1. Crear la pantalla del **'Why Now'** con los **3 recuadros de dolor** provocados por El Niño.
-2. Crear la barra de navegación superior para que durante la presentación podamos cambiar entre las 3 vistas.
+Desarrollar la pantalla que responde directamente al **Punto 3** del pitch:
+> *'Pico de El Niño en noviembre-diciembre en el NEA. Salud, Logística, Tiempo y Dinero.'*
 
-## Dónde trabajas
-* Tu código de pantalla va en: web/src/views/3-impacto/
-* Tus imágenes van en: web/public/assets-view3/
-* La barra de menú va en: web/src/components/Navbar.jsx
-* **Importante:** No toques las carpetas 1-visor ni 2-operaciones.
-
-## Elementos Clave que debe tener tu vista:
-1. **Banner de Urgencia:** 'Alerta El Niño 2026: Pico de precipitaciones en el NEA'.
-2. **Los 3 Recuadros de Dolor (Tarjetas de Impacto):**
-   - **Recuadro 1 (SALUD):** Tarjeta con alerta y foto de ambulancia volcada/varada en el lodo. Aislamiento sanitario.
-   - **Recuadro 2 (LOGÍSTICA HUMANITARIA):** Tarjeta con camión de donaciones de Cáritas/Cruz Roja detenido. La ayuda no llega a evacuados.
-   - **Recuadro 3 (TIEMPO Y DINERO / ECONOMÍA):** Pérdida de producción láctea y cosechas varadas; escuelas rurales incomunicadas.
-3. **Navbar.jsx:** Botones simples para saltar entre [View 1: Visor SAR], [View 2: Operaciones] y [View 3: Impacto El Niño].
+## Qué debe mostrar tu View:
+1. Barra superior de navegación (Navbar.jsx) con botones: `[1. ¿Qué es?]` `[2. Cliente Ideal]` `[3. Why Now - El Niño]`.
+2. Banner de urgencia climática: Pico de El Niño en el NEA.
+3. Los 3 Recuadros de Dolor:
+   - **Recuadro 1 (SALUD):** Ambulancia volcada o varada en el lodo.
+   - **Recuadro 2 (LOGÍSTICA):** Donaciones de Cáritas/Cruz Roja que no llegan a los evacuados.
+   - **Recuadro 3 (TIEMPO Y DINERO):** Productores aislados, pérdida de cosechas y escuelas cerradas.
