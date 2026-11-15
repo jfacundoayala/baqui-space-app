@@ -1,109 +1,213 @@
-# BAQUI — Monitoreo Satelital SAR de Caminos Rurales
+# BAQUI · The state of rural roads, seen from space
 
-> **NASA Space Apps Challenge 2026** · Track: *Dancing with the SARs*  
-> **Web:** [baqui-nasa.vercel.app](https://baqui-nasa.vercel.app)  
-> **Repositorio Oficial:** [github.com/thomasskarp/baqui-space-app](https://github.com/thomasskarp/baqui-space-app)
+> **NASA Space Apps Challenge 2026** · Challenge *Dancing with the SARs* · Host city General San Martín, Chaco (Argentina)
+>
+> **Web:** [baqui-nasa.vercel.app](https://baqui-nasa.vercel.app) · **Español:** [README.es.md](README.es.md)
 
----
+> [!NOTE]
+> **Prototype.** **Real:** the NISAR (NASA-ISRO) radar measurement over 1,201.7 km of unpaved rural roads in the General San Martín corridor, Chaco. **Simulated:** the water in the demo (section 4) and the dispatch console (section 2). The web marks which is which.
 
-## 1. ¿Qué es y qué problema resuelve?
-> **"Baqui es un sistema que da información para prevenir daños frente al fenómeno de El Niño. Te dice cómo está el camino rural, para que decidas si salir sin tener que ir hasta ahí a mirar."**
-
-* **El desafío físico:** Durante El Niño, la nubosidad y tormentas son constantes. Los satélites ópticos tradicionales (Sentinel-2, Landsat) quedan **completamente ciegos** ante las nubes.
-* **La tecnología SAR:** El Radar de Apertura Sintética (SAR, Sentinel-1) emite pulsos de microondas que **atraviesan la cobertura nubosa día y noche**, detectando el agua acumulada sobre la calzada rural gracias a su baja retrodispersión especular.
-* **Desarrollo asociado (View 1):** Visor interactivo de caminos (diseño limpio: mapa oscuro, paneles de vidrio y estado con ícono + palabra) con selector de capa óptica vs. Radar SAR y estado de transitabilidad en tiempo real.
+BAQUI answers a single question: **is the rural road passable after the rain?** It uses NASA's NISAR radar, which sees through clouds, so that nobody has to go to the road to look.
 
 ---
 
-## 2. El Cliente Ideal y los 3 Dolores Reales
-Nuestros clientes y usuarios clave son los organismos públicos y las organizaciones que deben responder ante emergencias:
-* **Organismos del Estado:** Protección Civil provincial y municipal, Direcciones de Vialidad Provincial, Ministerios de Salud.
-* **Organizaciones Humanitarias y ONGs:** Cáritas Argentina, Cruz Roja Argentina, Bomberos Voluntarios.
+## Contents
 
-### Los 3 Dolores Críticos:
-1. **Despacho a ciegas:** No tienen forma de saber si un camino de tierra está cortado antes de enviar una unidad.
-2. **Pérdida y daño de vehículos:** Ambulancias y camiones de auxilio volcados o varados en el lodo.
-3. **Incertidumbre en tiempos de respuesta:** Desvíos imprevistos que retrasan la asistencia médica y humanitaria en momentos críticos.
-* **Desarrollo asociado (View 2):** Consola de despacho y gestión de contingencia para Protección Civil y ONGs que ejemplifica el riesgo operativo actual.
-
----
-
-## 3. El "Why Now" / Disparador de Urgencia - EL NIÑO
-> **"El Fenómeno El Niño llega a su pico crítico entre noviembre y diciembre sobre el NEA, con lluvias récord (+209%) y caminos rurales anegados. Las provincias están actualizando sus planes de contingencia hoy. BAQUI llega cuando más se necesita para prevenir desastres en Salud, Logística, Tiempo y Dinero."**
-
-### Las 3 Crisis que Atacamos (Recuadros de Dolor):
-1. **SALUD (Recuadro 1):** Ambulancias volcadas o atascadas en el fango; puestos sanitarios y parajes aislados sin auxilio.
-2. **LOGÍSTICA HUMANITARIA (Recuadro 2):** Camiones con víveres y donaciones de Cáritas/Cruz Roja detenidos por cortes de agua. La ayuda no llega a los evacuados.
-3. **TIEMPO Y DINERO / ECONOMÍA (Recuadro 3):** Productores de soja, algodón y tambos lácteos sin poder sacar su producción; maestros y escuelas rurales incomunicadas con pérdidas millonarias.
-* **Desarrollo asociado (View 3):** Pantalla de impacto con los 3 recuadros de dolor, alertas de El Niño y la barra de navegación general entre vistas.
+1. [The problem](#1-the-problem)
+2. [What BAQUI does](#2-what-baqui-does)
+3. [How it works](#3-how-it-works)
+4. [NASA data we use](#4-nasa-data-we-use)
+5. [Real result](#5-real-result)
+6. [The web, section by section](#6-the-web-section-by-section)
+7. [How to run it](#7-how-to-run-it)
+8. [Repo structure](#8-repo-structure)
+9. [Real and simulated](#9-real-and-simulated)
+10. [Limits](#10-limits)
+11. [Path to production and scale](#11-path-to-production-and-scale)
+12. [Use of AI](#12-use-of-ai)
+13. [Credits and license](#13-credits-and-license)
 
 ---
 
-## 🗺️ Mapa de Desarrollo y Responsables
+## 1. The problem
 
-| Punto del Pitch | Vista | Responsable | Carpeta de Trabajo |
-|---|---|---|---|
-| **1. ¿Qué es y qué resuelve?** | View 1: Visor SAR | Dev 1 | `web/src/views/1-visor/` |
-| **2. Cliente Ideal y 3 Dolores** | View 2: Operaciones | Dev 2 | `web/src/views/2-operaciones/` |
-| **3. Why Now: El Niño** | View 3: Impacto & Nav | Dev 3 | `web/src/views/3-impacto/` |
+When it rains in the countryside, dirt roads get cut off. Red Cross, Civil Protection, Cáritas, the roads agency (Vialidad) and farmers **set out without knowing whether the road can be crossed**: they dispatch blindly, risk vehicles and lose time and money.
 
----
+Heavy rain comes with clouds, and satellites that take ordinary "photos" see nothing. With El Niño, which may intensify toward the end of the year and the start of the next, the problem grows.
 
-## 🚀 Cómo Empezar
+## 2. What BAQUI does
 
-```bash
-# 1. Clonar el repositorio
-git clone https://github.com/thomasskarp/baqui-space-app.git
-cd baqui-space-app
+| For whom | What question | What it answers |
+|---|---|---|
+| State agencies and NGOs (Civil Protection, Vialidad, Red Cross, Cáritas) and farmers | "Can I get there today?" | Whether the road is **passable or impassable**, segment by segment, with the radar data behind it |
 
-# 2. Navegar a la app web
-cd web
+## 3. How it works
 
-# 3. Instalar y correr
-npm install
-npm run dev
+The NISAR radar sends a radio signal toward the ground and listens to how much bounces back (the **echo**). The signal goes through clouds and works at night. Water changes the echo:
+
+| Ground | What happens | Echo |
+|---|---|---|
+| **Dry** | Firm ground | Normal |
+| **Wet** | No standing water: wet soil returns more signal | **Rises** |
+| **Under water** | Water covers the ground and acts as a mirror | **Drops** |
+
+```mermaid
+flowchart LR
+    A["NISAR GCOV<br/>L-band radar, HH and HV<br/>(NASA-ISRO, ASF DAAC)"] --> B["Read only the window<br/>of the corridor"]
+    C["OpenStreetMap<br/>rural roads"] --> D
+    B --> D["Compare the pass after the rain<br/>with a reference pass from the same orbit"]
+    D --> E["Extra echo along the<br/>centerline of each road"]
+    F["IMERG rain · OPERA water<br/>SMAP moisture · terrain height"] --> G
+    E --> G["State per segment<br/>passable / impassable"]
+    G --> H["Web: Can I get there today?"]
 ```
 
----
+Step by step:
 
-## 🔬 Análisis de datos de NASA
-Los scripts que bajan y miden el radar NISAR, los tests y la hipótesis física están en [`analisis/`](analisis/README.md).
+1. **Find the passes** of NISAR over the area with NASA's official tool (`earthaccess`, NASA Earthdata).
+2. **Read only the corridor.** The whole scene (about 1.8 GB) is not downloaded: the window that matters (about 43 MB) is read over the internet.
+3. **Locate the roads** with OpenStreetMap and measure only the center of each one (pixels within 10 m of the centerline).
+4. **Compare** a pass after the rain with a reference pass from the **same orbit**, so the satellite looks from the same angle. The difference is the extra echo.
+5. **Classify** each segment by adding rainfall (IMERG), surface water (OPERA), soil moisture (SMAP) and whether the segment lies in a low spot or on a rise (terrain height).
 
----
+The details are in [`analisis/docs/HIPOTESIS-FISICA.md`](analisis/docs/HIPOTESIS-FISICA.md) and [`analisis/docs/ALGORITMO-BAQUI.md`](analisis/docs/ALGORITMO-BAQUI.md).
 
-## 📄 Guión del Pitch
-El guión cronometrado para la presentación de 3 minutos se encuentra documentado en [`docs/guion-pitch.md`](docs/guion-pitch.md).
+## 4. NASA data we use
 
----
+| Data | Source | Used for | In the prototype |
+|---|---|---|---|
+| **NISAR L2 GCOV** (L-band, HH and HV) | NASA-ISRO, via ASF DAAC | Radar echo over the roads | **Measured** (numbers in section 5) |
+| **IMERG** (daily rainfall) | NASA GPM | Rainfall since the pass, per segment | Downloaded and used in the algorithm |
+| **OPERA DSWx-S1** (surface water) | NASA JPL | Control: where water is visible | Used in the checks |
+| **SMAP** (soil moisture) | NASA | Moisture of the area | Downloaded |
+| **Blue Marble** | NASA | Image of the Earth on the 3D globe | On the web |
+| Copernicus DEM GLO-30 | ESA (not NASA) | Terrain height: low spot or rise | Downloaded |
+| OpenStreetMap | OSM community | The roads | Real |
 
-## 🤖 Uso de IA (lo que NASA llama "SI")
+All data are public and free. They are not in the repo because they weigh several GB: they are downloaded with the scripts in [`analisis/`](analisis/README.md).
 
-Las reglas de Space Apps 2026 piden contar cómo usamos la IA. Esto es lo que hicimos.
+## 5. Real result
 
-### Qué hizo la IA
+General San Martín corridor (Chaco), ascending orbit 161, frame 164. A pass after the rain against a reference pass from the same orbit.
 
-| Herramienta | Para qué la usamos |
+| Measurement | Value | What it means |
+|---|---|---|
+| Extra echo along the road centerline (median, HH) | **+1.35 dB** | The ground got wet |
+| Road points with more than 1 dB extra | **6 out of 10** | Not an isolated case |
+| Without forest: road centerline against open field | **+1.63 dB vs +1.57 dB** | The whole area got wet, not just the road |
+| Points with new open water | **3 of 53,611 (0.006%)** | Wet, not under water |
+| Roads measured | **1,201.7 km** | Unpaved rural roads from OpenStreetMap |
+
+**Conclusion:** the radar sees the **wet area**. Each number has its source file noted in [`web/src/data/resultados.json`](web/src/data/resultados.json) (`_fuente` fields). Anyone can verify it for free in [ASF Vertex](https://search.asf.alaska.edu/) with the file ID given by the web.
+
+## 6. The web, section by section
+
+| # | Section | What it shows | Folder |
+|---|---|---|---|
+| 1 | What BAQUI is | 3D globe with NISAR in its real orbit (Celestrak TLE propagated with `satellite.js`) | [`web/src/views/1-visor/`](web/src/views/1-visor/) |
+| 2 | The problem | Who suffers from the cut road, and the dispatch console (illustrative scene) | [`web/src/views/2-operaciones/`](web/src/views/2-operaciones/) |
+| 3 | Why now: El Niño | Health, logistics, time and money | [`web/src/views/3-impacto/`](web/src/views/3-impacto/) |
+| 4 | The demo: will you get there today? (¿Llegás hoy?) | You pick a destination and BAQUI answers whether you can get there, on real roads with simulated water | [`web/src/views/4-demo/`](web/src/views/4-demo/) |
+| 5 | How BAQUI knows | Physical hypothesis and the real NISAR measurement | [`web/src/views/5-resultados/`](web/src/views/5-resultados/) |
+
+All the texts of each section are in its `textos.ts` file.
+
+## 7. How to run it
+
+**Web** (Next.js 16, React 19, TypeScript, Tailwind 4, three.js, Leaflet):
+
+```bash
+cd web
+pnpm install
+pnpm dev        # http://localhost:3000
+```
+
+**Analysis** (Python):
+
+```bash
+cd analisis
+pip install -r requirements.txt
+python -m pytest -q tests   # 53 tests, they do not need the data
+```
+
+To download the NASA data you need a free [NASA Earthdata](https://urs.earthdata.nasa.gov/) account. The commands are in [`analisis/README.md`](analisis/README.md).
+
+## 8. Repo structure
+
+```
+baqui-space-app/
+├── web/                    The page (Next.js)
+│   ├── src/views/          One folder per section (1 to 5), each with its textos.ts
+│   ├── src/data/           resultados.json: the real numbers with their source
+│   └── public/             Images
+├── analisis/               The science (Python)
+│   ├── baqui/              Download, measurement, classification, rainfall and drying
+│   ├── baqui/chequeos/     Checks that generate the numbers on the web
+│   ├── tests/              53 tests
+│   └── docs/               Physical hypothesis, algorithm and rules for the state of each segment
+└── docs/                   Pitch and video script
+```
+
+## 9. Real and simulated
+
+| Real | Simulated or illustrative |
 |---|---|
-| **Claude Code** (Anthropic) | Escribió la mayor parte del código de la web: Next.js, el globo con three.js y la demo con Leaflet. También los scripts de Python que bajan y miden los datos de NISAR, y los documentos técnicos, como la hipótesis física. Los commits que hizo llevan la línea `Co-Authored-By: Claude`. |
-| **Claude Code con varios agentes** | Revisaron el diseño y la exactitud de los textos. Cada problema que encontraba un agente lo confirmaba otro antes de aplicar el cambio. |
-| **Modelos gratuitos** (vía FreeLLMAPI) | Leer y resumir fuentes públicas: noticias del SMN, informes de IERAL-NEA y documentación de NASA. Nunca recibieron datos privados. |
+| NISAR data and the measurement in section 5 | The water in the demo (section 4) |
+| Roads and places from OpenStreetMap | The dispatch console (section 2) |
+| The NISAR orbit on the globe | The footer photo: it is from Veracruz, Mexico, not from the measured corridor |
+| Image of the Earth (NASA Blue Marble) | |
 
-### Qué hicimos las personas
+## 10. Limits
 
-- Elegimos el desafío, la idea (si el camino rural está transitable o no) y a quién le sirve (Estado y ONG).
-- Decidimos cada texto y cada cambio de diseño. La IA proponía; el equipo aprobaba o pedía otra cosa.
-- Pedimos que cada número se cotejara contra su archivo de origen y cada fuente se abriera antes de citarla. Ese chequeo lo hizo la IA y nosotros lo revisamos.
+- **The radar measures the area, not just the road.** At this resolution the road and the surrounding field rise almost equally. That is why we say "wet area".
+- **Water under forest is not confirmed.** 38.1% of the road centerline has forest.
+- **It is a single comparison** (one pair of passes). It still needs validation on the ground.
+- **The state per segment and the day-by-day drying are programmed but not calibrated.** The demo uses simulated water.
+- **Frequency:** NISAR repeats its orbit every 12 days. Over the corridor, 3 different orbits passed in 12 days, so there is new data about every 4 days.
+- **NISAR products are provisional** and are currently published with a delay.
 
-### Lo que no sale de la IA
+## 11. Path to production and scale
 
-- **Los números** de la página (+1,35 dB de eco extra, 6 de cada 10 puntos del camino, 0,006 % con agua abierta) salen de correr nuestros scripts sobre datos reales de NISAR (ASF), SMAP, IMERG y OPERA. Cada uno tiene su origen anotado en [`web/src/data/resultados.json`](web/src/data/resultados.json), en los campos `_fuente`.
-- **La imagen de la Tierra** es Blue Marble de NASA. No hay imágenes generadas con IA.
-- **Los caminos y lugares de la demo** son reales, de OpenStreetMap. **El agua de la demo es simulada**, y la página lo dice.
+**The central idea: NASA stores the images, BAQUI stores only the answer.**
 
-### AI use (English summary)
+| What | Size | How we know |
+|---|---|---|
+| A full NISAR scene | ~1.8 GB | Measured |
+| The corridor window we read | ~43 MB | Measured (it already works this way) |
+| The result of one pass (about 12,000 segments of 100 m) | under 1 MB | Estimated |
 
-- **Claude Code (Anthropic)** wrote most of the web code (Next.js, three.js globe, Leaflet demo), the Python scripts that download and measure NISAR data, and the technical docs. Commits it made carry `Co-Authored-By: Claude`.
-- **Several Claude agents** reviewed design and text accuracy. Each issue was confirmed by a second agent before it was applied.
-- **Free models (via FreeLLMAPI)** read and summarized public sources only. No private data was sent to them.
-- **The team** chose the challenge, the idea and the audience, approved every text and design change, and required every number and source to be checked against its origin (done by AI, reviewed by the team).
-- **Not AI-generated:** the numbers come from running our scripts on real NISAR, SMAP, IMERG and OPERA data (sources noted in `web/src/data/resultados.json`). The Earth image is NASA Blue Marble. The roads and places come from OpenStreetMap. The water in the demo is simulated, and the page says so.
+More than 2,000 times less than what would have to be stored. With about 90 passes per year over the corridor, the database grows about 70 to 80 MB per year. For 100,000 km of roads, what is queried (today's state, one row per segment) takes about 60 MB, and the history goes to cheap storage.
+
+Proposed architecture:
+
+```mermaid
+flowchart LR
+    A["Daily alert:<br/>is there a new pass?<br/>(NASA CMR)"] --> B["One job per scene,<br/>in parallel, next to the data<br/>(NASA Earthdata Cloud)"]
+    B --> C["Database with maps<br/>segments · passes · readings<br/>(Postgres + PostGIS)"]
+    C --> D["Web and API<br/>today's state"]
+    D --> E["WhatsApp alerts<br/>to farmers and agencies"]
+```
+
+Each reading stores the ID of the NASA file, so anyone can redo the calculation.
+
+## 12. Use of AI
+
+The Space Apps 2026 rules ask us to state how we used AI.
+
+| Tool | Used for |
+|---|---|
+| **Claude Code** (Anthropic) | Wrote most of the code: the web (Next.js, three.js globe, Leaflet demo), the Python scripts that download and measure NISAR, and the technical documents. Its commits carry `Co-Authored-By: Claude`. |
+| **Several Claude agents** | Reviewed the design and the accuracy of the texts. Each problem was confirmed by a second agent before the change was applied. |
+| **Free models** (via FreeLLMAPI) | Reading and summarizing public sources. They never received private data. |
+
+**What the team did:** chose the challenge, the idea and who it serves; approved every text and every design change; asked that every number be checked against its source file and that every source be opened before citing it.
+
+**What does not come from AI:** the numbers (they come from running our scripts on real NASA data), the image of the Earth (NASA Blue Marble), the footer photo (a real photo from Wikimedia Commons) and the roads (OpenStreetMap). There are no AI-generated images.
+
+## 13. Credits and license
+
+- **Code:** [MIT](LICENSE) license.
+- **Data:** NASA (NISAR with ISRO, IMERG, OPERA, SMAP, Blue Marble), public data. Copernicus DEM GLO-30 from ESA.
+- **Roads:** © [OpenStreetMap](https://www.openstreetmap.org/copyright) contributors, ODbL license.
+- **Footer photo:** "Camino inundado en Salinas, Alvarado, Veracruz 01", by Isaacvp, [Wikimedia Commons](https://commons.wikimedia.org/wiki/File:Camino_inundado_en_Salinas,_Alvarado,_Veracruz_01.jpg), CC BY-SA 4.0 license. Adapted (crop and tone), under the same license.
+- BAQUI is not affiliated with NASA and does not represent it.
