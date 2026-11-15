@@ -40,11 +40,13 @@ Justo cuando más llueve hay nubes, y los satélites que sacan "fotos" comunes n
 
 | Rol | Quién | Qué obtiene |
 |---|---|---|
-| **Cliente** (paga el servicio) | Organismos del Estado y ONG: Protección Civil, Vialidad, Cruz Roja, Cáritas | Menos vehículos varados y ayuda que llega a tiempo |
+| **Cliente** (paga el servicio) | Organismos del Estado, ONG y operaciones de rescate: Protección Civil, Vialidad, Cruz Roja, Cáritas, Bomberos | Menos vehículos varados y ayuda que llega a tiempo |
 | **Usuario** (consulta antes de salir) | La persona encargada de despachar: mercadería, donaciones o una ambulancia | La respuesta a "¿llego hoy a este lugar?": **transitable o intransitable**, tramo por tramo, con el dato del radar que la respalda |
 | **Beneficiados** | La gente del campo y los afectados por la lluvia y las inundaciones | Que la ayuda y los insumos lleguen a tiempo, y que la producción salga |
 
 Todos los datos que usa BAQUI son públicos y gratis. El costo del servicio (procesar y mantener el dato al día) lo pagaría el cliente.
+
+> **Para quién es este MVP.** Está pensado para organismos del Estado, ONG y operaciones de rescate: los que tienen que despachar una ambulancia, una donación o un equipo después de la lluvia. En la [etapa 2](#12-hoja-de-ruta) se abre también a productores rurales y gente del campo.
 
 ## 3. Cómo funciona
 
@@ -246,10 +248,11 @@ flowchart LR
 - La hipótesis física probada en una comparación (pasada después de la lluvia contra una de referencia de la misma órbita).
 - Web con la demo "¿Llegás hoy?" sobre caminos reales (agua simulada), verificable gratis en ASF Vertex.
 - Algoritmo programado: estado por tramo, lluvia desde la pasada (IMERG) y secado. 53 tests.
-- Público: organismos del Estado y ONG.
+- Público: organismos del Estado, ONG y operaciones de rescate.
 
 ### Etapa 2 · Más superficie, datos al día y defectos corregidos
 
+- **Más público:** se suman los productores rurales y la gente del campo, que consultan su camino antes de salir.
 - **Más superficie:** del corredor a toda la provincia del Chaco y después al NEA.
 - **Datos al día, solos:** un aviso diario busca pasadas nuevas de NISAR y las procesa sin intervención (arquitectura de la [sección 11](#11-camino-a-producción-y-escala)). La lluvia (IMERG) y la humedad (SMAP) actualizan el estado todos los días entre pasadas.
 - **Más pasadas:** sumar SAOCOM (radar argentino de CONAE, banda L como NISAR) y Sentinel-1 / OPERA para tener un dato del camino más seguido, y CYGNSS (NASA) para saber casi a diario si la zona se mojó.
@@ -269,7 +272,7 @@ flowchart LR
 ### Etapa 3 · Más regiones y más gente
 
 - **Más superficie:** el resto de Argentina y otros países con caminos de tierra y temporadas de lluvia. NISAR cubre todo el planeta.
-- **Más público:** productores rurales, trabajadores del campo, transportistas, escuelas rurales y cualquier persona que tenga que salir por un camino de tierra.
+- **Todavía más público:** transportistas, escuelas rurales y cualquier persona que tenga que salir por un camino de tierra.
 - **Donde la gente ya está:** consulta y avisos por WhatsApp ("¿llego hoy a…?"), un mapa público y una API para Vialidad, Protección Civil y las ONG.
 - **La meta:** que no se pierda producción, plata ni tiempo, y que las ambulancias y las donaciones lleguen a tiempo. Para comprobar que se cumple, medimos cuántas respuestas acierta BAQUI contra lo que se ve en el terreno, y cuánto tiempo ahorran los despachos.
 

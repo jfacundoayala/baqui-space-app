@@ -40,11 +40,13 @@ Heavy rain comes with clouds, and satellites that take ordinary "photos" see not
 
 | Role | Who | What they get |
 |---|---|---|
-| **Customer** (pays for the service) | State agencies and NGOs: Civil Protection, the roads agency (Vialidad), Red Cross, Cáritas | Fewer stranded vehicles and aid that arrives on time |
+| **Customer** (pays for the service) | State agencies, NGOs and rescue operations: Civil Protection, the roads agency (Vialidad), Red Cross, Cáritas, firefighters | Fewer stranded vehicles and aid that arrives on time |
 | **User** (checks before leaving) | The person in charge of dispatching: goods, donations or an ambulance | The answer to "can I get there today?": **passable or impassable**, segment by segment, with the radar data behind it |
 | **Beneficiaries** | Rural communities and people affected by rain and floods | Aid and supplies arrive on time, and production gets out |
 
 All the data BAQUI uses is public and free. The cost of the service (processing and keeping the data up to date) would be paid by the customer.
+
+> **Who this MVP is for.** It is designed for State agencies, NGOs and rescue operations: those who have to dispatch an ambulance, a donation or a crew after the rain. In [stage 2](#12-roadmap) it also opens to farmers and rural communities.
 
 ## 3. How it works
 
@@ -246,10 +248,11 @@ flowchart LR
 - The physical hypothesis tested in one comparison (a pass after the rain against a reference pass from the same orbit).
 - Web with the "Will you get there today?" demo on real roads (simulated water), verifiable for free in ASF Vertex.
 - Algorithm programmed: state per segment, rainfall since the pass (IMERG) and drying. 53 tests.
-- Audience: State agencies and NGOs.
+- Audience: State agencies, NGOs and rescue operations.
 
 ### Stage 2 · More area, up-to-date data and defects fixed
 
+- **Wider audience:** farmers and rural communities join, checking their road before they leave.
 - **More area:** from the corridor to the whole province of Chaco, then to Northeast Argentina.
 - **Data kept up to date automatically:** a daily check finds new NISAR passes and processes them with no manual step (architecture in [section 11](#11-path-to-production-and-scale)). Rainfall (IMERG) and soil moisture (SMAP) update the state every day between passes.
 - **More passes:** add SAOCOM (Argentina's CONAE radar, L-band like NISAR) and Sentinel-1 / OPERA to get road data more often, and CYGNSS (NASA) to know almost daily whether the area got wet.
@@ -269,7 +272,7 @@ flowchart LR
 ### Stage 3 · More regions and more people
 
 - **More area:** the rest of Argentina and other countries with dirt roads and rainy seasons. NISAR covers the whole planet.
-- **Wider audience:** farmers, rural workers, truck drivers, rural schools and anyone who has to travel on a dirt road.
+- **Even wider audience:** truck drivers, rural schools and anyone who has to travel on a dirt road.
 - **Where people already are:** queries and alerts over WhatsApp ("can I get to … today?"), a public map and an API for the roads agency, Civil Protection and NGOs.
 - **The goal:** no lost production, money or time, and ambulances and donations that arrive on time. To check that it works, we measure how many BAQUI answers match what is seen on the ground, and how much time dispatches save.
 
