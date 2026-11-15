@@ -1,0 +1,11 @@
+{
+  "camino_id": "RP-13-CHACO",
+  "nombre": "Ruta Provincial 13 - Acceso Escuela Rural 42",
+  "longitud_km": 18.5,
+  "estado_actual": "CORTADO",
+  "porcentaje_anegamiento": 64.2,
+  "sensor": "Sentinel-1 SAR C-Band (VV/VH)",
+  "condicion_optica": "Nubosidad 100% (Sensor óptico ciego)",
+  "alerta_seguridad": "Peligro inminente de vuelco o atascamiento para vehículos pesados y ambulancias",
+  "desvio_sugerido": "Ruta Nacional 11 empalme camino consolidado Norte (+14 km)"
+}
