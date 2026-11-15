@@ -20,6 +20,8 @@
   --nodata: #a3adbf;
   --nodata-bg: rgb(163 173 191 / 0.12);
   --water: #2f7fd1;
+  /* Curva de salida fuerte para entradas y respuestas de la interfaz. */
+  --ease-out: cubic-bezier(0.23, 1, 0.32, 1);
   color-scheme: dark;
 }
 
@@ -91,8 +93,16 @@ body {
 .rise { animation: rise 0.7s cubic-bezier(0.2, 0.7, 0.2, 1) both; }
 
 /* Revelado al llegar con el scroll (lo activa el componente Reveal). */
-.reveal { opacity: 0; transform: translateY(18px); transition: opacity 0.7s ease, transform 0.7s cubic-bezier(0.2, 0.7, 0.2, 1); }
+.reveal { opacity: 0; transform: translateY(12px); transition: opacity 500ms var(--ease-out), transform 500ms var(--ease-out); }
 .reveal.is-in { opacity: 1; transform: none; }
+
+/* Cambio de ícono (Copiar → Copiado) y contenido que se despliega. */
+@keyframes icono {
+  from { opacity: 0; transform: scale(0.8); filter: blur(2px); }
+}
+@keyframes desplegar {
+  from { opacity: 0; transform: translateY(-4px); }
+}
 
 :focus-visible {
   outline: 2px solid var(--accent);
@@ -107,5 +117,6 @@ body {
     animation-iteration-count: 1 !important;
     transition-duration: 0.001ms !important;
   }
-  .reveal { opacity: 1; transform: none; }
+  /* Menos movimiento no es cero: se queda el fundido, sin desplazamiento. */
+  .reveal { transform: none; transition: opacity 250ms ease !important; }
 }

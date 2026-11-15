@@ -157,13 +157,13 @@ function Copiar({ texto, que }: { texto: string; que: string }) {
         type="button"
         onClick={copiar}
         aria-label={t.copiarLector(que)}
-        className={`inline-flex shrink-0 items-center gap-1.5 rounded-lg border px-2.5 py-1.5 text-xs font-medium transition-colors duration-200 ${
+        className={`inline-flex shrink-0 items-center gap-1.5 rounded-lg border px-2.5 py-1.5 text-xs font-medium transition-[color,background-color,border-color,scale] duration-150 ease-[var(--ease-out)] motion-safe:active:scale-[0.97] ${
           copiado
             ? "border-ok/40 bg-ok-bg text-ok"
             : "border-line bg-surface text-ink-2 hover:bg-surface-2 hover:text-ink"
         }`}
       >
-        <Icono aria-hidden className="size-3.5" strokeWidth={2.25} />
+        <Icono aria-hidden className="size-3.5 animate-[icono_180ms_var(--ease-out)]" strokeWidth={2.25} />
         <span aria-hidden>{copiado ? t.copiado : t.copiar}</span>
       </button>
       <span role="status" className="sr-only">
@@ -211,7 +211,7 @@ function ArchivoReferencia({ titulo, nombre, que }: { titulo: string; nombre: st
           />
         </span>
       </summary>
-      <div className="flex items-start gap-3 px-3 pb-3">
+      <div className="flex items-start gap-3 px-3 pb-3 group-open:animate-[desplegar_200ms_var(--ease-out)]">
         <div className="min-w-0 flex-1">
           <NombreArchivo nombre={nombre} chico />
         </div>
@@ -279,7 +279,7 @@ export default function Seccion5() {
         <div className="grid gap-3 sm:gap-4 lg:grid-cols-12 lg:gap-5">
           {/* Número grande. Sin la barra de la red por estados: la respuesta tiene solo 2 opciones
               (pedido de Facundo, 15/11) y no reclasificamos lo medido. */}
-          <Reveal delay={80} className="lg:col-span-7">
+          <Reveal delay={50} className="lg:col-span-7">
             <article
               ref={refNumero}
               className="glass relative flex h-full flex-col justify-center overflow-hidden rounded-[1.75rem] p-5 sm:p-8 lg:p-10"
@@ -293,8 +293,10 @@ export default function Seccion5() {
               </div>
               <p className="sr-only">{t.lectorPrincipal(fmt(kmIntransitable, decimalesPrincipal), fmt(red.km_total, 0))}</p>
               <div aria-hidden className="mt-4 flex items-end gap-3 sm:mt-6">
-                <span className="text-[clamp(4.75rem,18vw,9rem)] font-semibold leading-[0.85] tracking-[-0.04em] text-ink tabular-nums">
-                  {fmt(contado, decimalesPrincipal)}
+                {/* El valor final, invisible, reserva el ancho: el rótulo no salta cuando el contador suma dígitos. */}
+                <span className="grid text-[clamp(4.75rem,18vw,9rem)] font-semibold leading-[0.85] tracking-[-0.04em] text-ink tabular-nums">
+                  <span className="invisible col-start-1 row-start-1">{fmt(kmIntransitable, decimalesPrincipal)}</span>
+                  <span className="col-start-1 row-start-1">{fmt(contado, decimalesPrincipal)}</span>
                 </span>
                 <span className="pb-1 text-xl leading-tight text-ink-2 sm:pb-2 sm:text-2xl">
                   {t.unidadKm}
@@ -311,7 +313,7 @@ export default function Seccion5() {
 
           <div className="flex flex-col gap-3 sm:gap-4 lg:col-span-5">
             {/* Datos de apoyo: 2 columnas compactas también en el celular */}
-            <Reveal delay={160}>
+            <Reveal delay={90}>
               <div className="grid grid-cols-2 gap-3 sm:gap-4">
                 <Apoyo
                   icono={Droplets}
@@ -329,7 +331,7 @@ export default function Seccion5() {
             </Reveal>
 
             {/* Fuente */}
-            <Reveal delay={240} className="flex-1">
+            <Reveal delay={120} className="flex-1">
               <section aria-labelledby="s5-fuente" className="glass h-full rounded-[1.75rem] p-4 sm:p-5">
                 <div className="flex items-center gap-2">
                   <Satellite aria-hidden className="size-4 text-accent" strokeWidth={2} />
@@ -358,7 +360,7 @@ export default function Seccion5() {
         </div>
 
         {/* Cierre + pie */}
-        <Reveal delay={320}>
+        <Reveal delay={150}>
           <footer className="flex flex-col gap-5 border-t border-line pt-4 lg:flex-row lg:items-end lg:justify-between lg:gap-10">
             <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between lg:order-last lg:flex-col lg:items-end">
               {/* Sin botón "Probá la demo" (pedido de Facundo, 15/11). */}

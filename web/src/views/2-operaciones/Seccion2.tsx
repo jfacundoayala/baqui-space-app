@@ -24,12 +24,12 @@ export default function Seccion2() {
         </Reveal>
 
         <div className="grid gap-6 lg:grid-cols-12 lg:gap-8">
-          <Reveal delay={80} className="lg:col-span-7">
+          <Reveal delay={80} className="glass relative overflow-hidden rounded-3xl lg:col-span-7">
             <Consola />
           </Reveal>
 
           <div className="lg:col-span-5">
-            <Reveal delay={160}>
+            <Reveal delay={120}>
               <h3 className="mb-4 font-mono text-xs tracking-wider text-ink-3">{textos.dolores.titulo}</h3>
             </Reveal>
             <ol className="grid gap-3 sm:grid-cols-3 lg:grid-cols-1">
@@ -37,8 +37,8 @@ export default function Seccion2() {
                 const Icono = ICONOS_DOLOR[i];
                 return (
                   <li key={d.numero}>
-                    <Reveal delay={220 + i * 120} className="h-full">
-                      <article className="glass group relative h-full overflow-hidden rounded-2xl p-5 transition-colors hover:bg-surface-2">
+                    <Reveal delay={160 + ([0, 60, 100][i] ?? 100)} className="glass relative h-full overflow-hidden rounded-2xl">
+                      <article className="h-full p-5">
                         <div className="flex items-start gap-4 sm:flex-col sm:gap-3 lg:flex-row lg:gap-4">
                           <span className="grid size-11 shrink-0 place-items-center rounded-xl border border-danger/30 bg-danger-bg">
                             <Icono aria-hidden className="size-5 text-danger" strokeWidth={2} />

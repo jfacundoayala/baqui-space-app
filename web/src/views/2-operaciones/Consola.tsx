@@ -19,13 +19,13 @@ const t = textos.consola;
 const COLUMNAS = "sm:grid-cols-[2.5rem_1fr_8.5rem_4.5rem]";
 
 /** Punto que pulsa suave mientras la unidad espera. Quieto fuera de pantalla o con menos movimiento. */
-function Pulso({ activo, clase }: { activo: boolean; clase: string }) {
+function Pulso({ activo, clase, desfase = 0 }: { activo: boolean; clase: string; desfase?: number }) {
   return (
     <span aria-hidden className="relative inline-flex size-2">
       {activo && (
         <span
           className={`absolute inset-0 rounded-full opacity-60 motion-safe:animate-ping ${clase}`}
-          style={{ animationDuration: "2.4s" }}
+          style={{ animationDuration: "2.4s", animationDelay: `-${desfase}s` }}
         />
       )}
       <span className={`relative inline-flex size-2 rounded-full ${clase}`} />
@@ -48,7 +48,7 @@ export default function Consola() {
   const activo = enPantalla && !menos;
 
   return (
-    <div ref={ref} className="glass relative overflow-hidden rounded-3xl">
+    <div ref={ref}>
       {/* Brillo superior del vidrio */}
       <div
         aria-hidden
@@ -95,8 +95,8 @@ export default function Consola() {
             const Icono = ICONOS[u.icono];
             return (
               <li key={u.codigo}>
-                <Reveal delay={120 + i * 110}>
-                  <div className={`grid grid-cols-[auto_1fr] items-center gap-x-3 gap-y-2 rounded-2xl border border-line bg-bg-2/60 px-3 py-2.5 transition-colors hover:bg-surface sm:gap-x-4 ${COLUMNAS}`}>
+                <Reveal delay={[100, 160, 200][i] ?? 200}>
+                  <div className={`grid grid-cols-[auto_1fr] items-center gap-x-3 gap-y-2 rounded-2xl border border-line bg-bg-2/60 px-3 py-2.5 sm:gap-x-4 ${COLUMNAS}`}>
                     <span className="grid size-9 place-items-center rounded-xl border border-line bg-surface">
                       <Icono aria-hidden className="size-5 text-ink-2" strokeWidth={1.8} />
                     </span>
@@ -112,7 +112,7 @@ export default function Consola() {
                         <Estado tono={u.tono} texto={u.estado} />
                       </span>
                       <span className="flex items-center justify-end gap-2 font-mono text-sm tabular-nums text-ink-2">
-                        {u.esperando && <Pulso activo={activo} clase={PUNTO[u.tono]} />}
+                        {u.esperando && <Pulso activo={activo} clase={PUNTO[u.tono]} desfase={[0, 0.9, 1.6][i] ?? 0} />}
                         <time>{u.hora}</time>
                       </span>
                     </div>
@@ -131,7 +131,7 @@ export default function Consola() {
           <Estado tono="sindato" texto={t.pieEstado} />
         </div>
         <p className="flex flex-wrap items-center gap-x-2 gap-y-1 text-xs text-ink-3">
-          <Pulso activo={activo} clase="bg-accent" />
+          <Pulso activo={activo} clase="bg-accent" desfase={0.5} />
           <span>{t.esperando}</span>
           <span aria-hidden className="text-line">·</span>
           <span>{t.pieFuente}</span>

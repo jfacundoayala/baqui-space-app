@@ -14,6 +14,9 @@ const ICONOS: Record<ClaveRecuadro, LucideIcon> = {
   dinero: Coins,
 };
 
+/** Escalonado corto y no uniforme para los 4 recuadros (ms). */
+const DEMORAS = [120, 165, 200, 225];
+
 /** Línea de fuente: organismo, con link. Sin fecha a la vista (pedido de Facundo, 15/11). */
 function LineaFuente({ f }: { f: Fuente3 }) {
   return (
@@ -94,8 +97,8 @@ export default function Seccion3() {
               const Icono = ICONOS[r.clave];
               return (
                 <li key={r.clave}>
-                  <Reveal delay={160 + i * 70} className="h-full">
-                    <article className="glass flex h-full flex-col rounded-2xl p-3.5 transition-[border-color,transform] duration-300 hover:-translate-y-0.5 hover:!border-warn/35 sm:p-5">
+                  <Reveal delay={DEMORAS[i] ?? 225} className="h-full">
+                    <article className="glass flex h-full flex-col rounded-2xl p-3.5 transition-[border-color] duration-200 ease-[ease] hover:!border-warn/35 sm:p-5">
                       <div className="flex items-center gap-2.5">
                         <span className="grid size-8 shrink-0 place-items-center rounded-lg border border-warn/30 bg-warn-bg text-warn sm:size-9 sm:rounded-xl">
                           <Icono aria-hidden className="size-4 sm:size-[18px]" strokeWidth={2} />

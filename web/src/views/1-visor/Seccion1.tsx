@@ -123,7 +123,7 @@ export default function Seccion1() {
           <button
             type="button"
             onClick={() => irA("s2")}
-            className="pointer-events-auto order-1 inline-flex flex-col items-center gap-0.5 rounded-full px-3 py-1 text-xs font-medium text-ink-2 transition-colors hover:text-ink lg:order-2 lg:absolute lg:left-1/2 lg:-translate-x-1/2"
+            className="pointer-events-auto order-1 inline-flex flex-col items-center gap-0.5 rounded-full px-3 py-1 text-xs font-medium text-ink-2 transition-[color,scale] duration-150 ease-[cubic-bezier(0.23,1,0.32,1)] hover:text-ink motion-safe:active:scale-[0.97] lg:order-2 lg:absolute lg:left-1/2 lg:-translate-x-1/2"
           >
             {t.bajar}
             <ChevronDown

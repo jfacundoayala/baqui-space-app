@@ -974,18 +974,18 @@ export default function Globo({ activo, menos }: { activo: boolean; menos: boole
         ref={contRef}
         role="img"
         aria-label={t.globo.descripcion}
-        className={`absolute inset-0 select-none transition-opacity duration-[1400ms] ease-out ${listo ? "opacity-100" : "opacity-0"}`}
+        className={`absolute inset-0 select-none transition-[opacity,scale] duration-[1000ms] ease-[cubic-bezier(0.23,1,0.32,1)] ${listo ? "opacity-100" : "opacity-0 motion-safe:scale-[0.96]"}`}
       >
         <div
           ref={chacoRef}
           aria-hidden
           className="group pointer-events-none absolute left-0 top-0 opacity-0 will-change-transform"
         >
-          <span className="glass ml-3 -mt-3 block -translate-y-full group-data-[lado=izq]:-ml-3 group-data-[lado=izq]:-translate-x-full whitespace-nowrap rounded-full px-2.5 py-1 text-xs font-medium text-ink">
+          <span className="glass -mt-3 block translate-x-3 -translate-y-full transition-transform duration-200 ease-[cubic-bezier(0.23,1,0.32,1)] motion-reduce:transition-none group-data-[lado=izq]:-translate-x-[calc(100%+0.75rem)] whitespace-nowrap rounded-full px-2.5 py-1 text-xs font-medium text-ink">
             {t.globo.lugar}
           </span>
         </div>
-        <div ref={satRef} aria-hidden className="group pointer-events-none absolute left-0 top-0 opacity-0 will-change-transform">
+        <div ref={satRef} aria-hidden className="group pointer-events-none absolute left-0 top-0 opacity-0 will-change-transform transition-opacity duration-200 ease-[cubic-bezier(0.23,1,0.32,1)]">
           <span className="glass block -translate-y-1/2 group-data-[lado=izq]:-translate-x-full whitespace-nowrap rounded-full px-2.5 py-1 font-mono text-xs font-semibold tracking-[0.14em] text-accent">
             {t.globo.satelite}
           </span>
@@ -998,8 +998,8 @@ export default function Globo({ activo, menos }: { activo: boolean; menos: boole
 
       {/* Datos de la órbita calculada (no es telemetría en vivo). */}
       <div
-        className={`glass absolute bottom-[22%] right-[7%] hidden w-64 rounded-2xl px-4 py-3.5 transition-opacity duration-700 lg:block ${
-          listo ? "opacity-100" : "opacity-0"
+        className={`glass absolute bottom-[22%] right-[7%] hidden w-64 rounded-2xl px-4 py-3.5 transition-[opacity,translate] duration-500 delay-500 ease-[cubic-bezier(0.23,1,0.32,1)] lg:block ${
+          listo ? "opacity-100" : "opacity-0 motion-safe:translate-y-2"
         }`}
       >
         <p className="flex items-center gap-2 text-xs font-medium text-ink-2">
