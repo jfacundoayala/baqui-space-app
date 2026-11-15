@@ -1,12 +1,10 @@
-// Todos los textos visibles de la sección 2 (cliente ideal y los 3 dolores).
+// Todos los textos visibles de la sección 2 (quiénes salen a ciegas y sus 3 problemas).
 // Para traducir al inglés, alcanza con cambiar este archivo.
 
 import type { Tono } from "@/components/Estado";
 
 export const textos = {
-  seccion: "Cliente ideal y los 3 dolores",
-  /** El número (02) y la raya los pone el componente Encabezado. */
-  etiqueta: "Cliente ideal",
+  seccion: "Quiénes salen a ciegas",
   titulo: "Salen sin saber si el camino da paso.",
   /** Los mismos organismos que la consola (Cruz Roja, Protección Civil y Cáritas), más Vialidad. */
   bajada: "Le pasa a Cruz Roja, Protección Civil, Cáritas y Vialidad cada vez que llueve en el campo.",
@@ -30,25 +28,21 @@ export const textos = {
   },
 
   dolores: {
-    titulo: "Los 3 dolores",
     lista: [
       {
         numero: "01",
         titulo: "No saben el estado del camino",
         texto: "Tienen que ir hasta ahí para comprobarlo.",
-        tipo: "Falta de información",
       },
       {
         numero: "02",
         titulo: "Arriesgan vehículos",
         texto: "Un vehículo encajado o roto es plata y tiempo perdidos.",
-        tipo: "Riesgo económico",
       },
       {
         numero: "03",
         titulo: "Despachan a ciegas",
         texto: "Salen sin saber si van a llegar ni por dónde.",
-        tipo: "Problema logístico",
       },
     ],
   },

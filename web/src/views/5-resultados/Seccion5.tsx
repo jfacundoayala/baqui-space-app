@@ -294,7 +294,7 @@ export default function Seccion5() {
         {/* Encabezado */}
         <Reveal>
           <header className="max-w-3xl">
-            <Encabezado numero={5} antetitulo={t.etiqueta} titulo={t.titulo} />
+            <Encabezado titulo={t.titulo} />
             <p className="mt-2 text-pretty text-sm text-ink-2 sm:mt-4 sm:text-lg lg:mt-2">{t.bajada}</p>
           </header>
         </Reveal>

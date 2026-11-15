@@ -16,8 +16,6 @@ const TIPOS: Record<string, string> = {
 
 export const T4 = {
   tituloSeccion: "La demo: ¿llegás hoy?",
-  /** El número (04) y la raya los pone el componente Encabezado. */
-  etiqueta: "La demo",
   titulo: "¿Llegás hoy?",
   bajada: "Elegí a dónde vas. BAQUI mira cómo está el camino hoy y te dice si podés salir.",
   bajadaNota: "En BAQUI el agua la ve el radar NISAR. En esta demo el agua es simulada.",

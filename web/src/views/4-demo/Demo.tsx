@@ -138,7 +138,7 @@ export default function Demo() {
     <div ref={raiz} className="mx-auto w-full max-w-6xl">
       {/* Encabezado */}
       <Reveal className="grid gap-4 lg:grid-cols-[1fr_minmax(0,28rem)] lg:items-end">
-        <Encabezado numero={4} antetitulo={T4.etiqueta} titulo={T4.titulo} />
+        <Encabezado titulo={T4.titulo} />
         <div className="hidden sm:block">
           <p className="text-base leading-snug text-ink-2 sm:text-lg">{T4.bajada}</p>
           <p className="mt-1.5 hidden text-sm text-ink-3 lg:block">

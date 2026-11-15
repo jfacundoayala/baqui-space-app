@@ -27,7 +27,6 @@ const CHARATA =
 
 export const T3 = {
   tituloSeccion: "Por qué ahora: El Niño",
-  antetitulo: "Por qué ahora",
   nuevaPestana: "(se abre en otra pestaña)",
 
   aviso: {

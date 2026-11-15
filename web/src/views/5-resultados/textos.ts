@@ -4,8 +4,6 @@
 
 export const textos = {
   tituloSeccion: "Cómo lo sabe BAQUI",
-  /** El número (05) y la raya los pone el componente Encabezado. */
-  etiqueta: "Cómo lo sabe BAQUI",
   // "Zona" y no "camino": el campo de alrededor subió casi lo mismo (+1,57 dB contra +1,63 dB en el eje), el radar no
   // separa el camino de su entorno (docs/HIPOTESIS-FISICA.md, sección 3). Elegido por Facundo, 15/11.
   titulo: "El radar ve la zona mojada.",

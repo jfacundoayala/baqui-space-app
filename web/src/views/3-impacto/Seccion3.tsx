@@ -3,7 +3,7 @@ import Seccion from "@/components/Seccion";
 import Estado from "@/components/Estado";
 import Fuente from "@/components/Fuente";
 import Reveal from "@/components/Reveal";
-import { Antetitulo, CLASE_H2 } from "@/components/Encabezado";
+import { CLASE_H2 } from "@/components/Encabezado";
 import Lienzo, { Pulso } from "./Lienzo";
 import { T3, type ClaveRecuadro, type Fuente3 } from "./textos";
 import s from "./Seccion3.module.css";
@@ -37,12 +37,8 @@ export default function Seccion3() {
     <Seccion id="s3" titulo={T3.tituloSeccion} className="bg-bg">
       <Lienzo>
         <div className="mx-auto w-full max-w-6xl">
-          <Reveal>
-            <Antetitulo numero={3}>{T3.antetitulo}</Antetitulo>
-          </Reveal>
-
           {/* Aviso grande: título a la izquierda, dos cifras en fila a la derecha. */}
-          <Reveal delay={80} className="mt-4">
+          <Reveal delay={80}>
             <article className="glass relative overflow-hidden rounded-3xl !border-warn/25">
               <span
                 aria-hidden

@@ -16,7 +16,7 @@ export default function Seccion2() {
       <div className="mx-auto w-full max-w-6xl">
         <Reveal>
           <header className="mb-3 max-w-4xl sm:mb-8 lg:mb-6">
-            <Encabezado numero={2} antetitulo={textos.etiqueta} titulo={textos.titulo} />
+            <Encabezado titulo={textos.titulo} />
             <p className="mt-2 max-w-2xl text-sm leading-relaxed text-ink-2 sm:mt-4 sm:text-lg">{textos.bajada}</p>
           </header>
         </Reveal>
@@ -27,9 +27,6 @@ export default function Seccion2() {
           </Reveal>
 
           <div className="lg:col-span-5">
-            <Reveal delay={120}>
-              <h3 className="mb-2 font-mono text-xs tracking-wider text-ink-3 sm:mb-4">{textos.dolores.titulo}</h3>
-            </Reveal>
             <ol className="grid grid-cols-3 gap-2 sm:gap-3 lg:grid-cols-1">
               {textos.dolores.lista.map((d, i) => {
                 const Icono = ICONOS_DOLOR[i];
@@ -42,13 +39,10 @@ export default function Seccion2() {
                             <Icono aria-hidden className="size-4 text-danger sm:size-5" strokeWidth={2} />
                           </span>
                           <div className="min-w-0">
-                            <p className="hidden font-mono text-xs text-ink-3 sm:block">
-                              <span aria-hidden>{d.numero} · </span>
-                              {d.tipo}
-                            </p>
-                            <h4 className="text-xs font-semibold leading-snug tracking-tight text-ink sm:mt-1 sm:text-base lg:text-lg">
+                            {/* Sin el rótulo "0N · tipo": era de la guía, no para el visitante (pedido de Facundo, 15/11). */}
+                            <h3 className="text-xs font-semibold leading-snug tracking-tight text-ink sm:text-base lg:text-lg">
                               {d.titulo}
-                            </h4>
+                            </h3>
                             <p className="mt-1 hidden text-sm leading-relaxed text-ink-2 sm:block">{d.texto}</p>
                           </div>
                         </div>
