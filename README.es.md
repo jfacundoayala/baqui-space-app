@@ -238,8 +238,8 @@ Cada lectura guarda el ID del archivo de NASA, así cualquiera puede rehacer el 
 
 ```mermaid
 flowchart LR
-    E1["Etapa 1 · MVP<br/>un corredor, una medición real<br/>Estado y ONG"] --> E2["Etapa 2 · Más superficie<br/>datos al día, defectos corregidos"]
-    E2 --> E3["Etapa 3 · Para todos<br/>más regiones, productores<br/>y gente del campo"]
+    E1["Etapa 1 · MVP<br/>un corredor, una medición real<br/>Estado, ONG y rescate"] --> E2["Etapa 2 · Más superficie<br/>datos al día, defectos corregidos<br/>+ productores y gente del campo"]
+    E2 --> E3["Etapa 3 · Para todos<br/>más regiones<br/>y más gente"]
 ```
 
 ### Etapa 1 · MVP (hecha, Space Apps 2026)
@@ -250,7 +250,7 @@ flowchart LR
 - Algoritmo programado: estado por tramo, lluvia desde la pasada (IMERG) y secado. 53 tests.
 - Público: organismos del Estado, ONG y operaciones de rescate.
 
-### Etapa 2 · Más superficie, datos al día y defectos corregidos
+### Etapa 2 · Más superficie, datos al día, defectos corregidos y productores
 
 - **Más público:** se suman los productores rurales y la gente del campo, que consultan su camino antes de salir.
 - **Más superficie:** del corredor a toda la provincia del Chaco y después al NEA.

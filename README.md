@@ -238,8 +238,8 @@ Each reading stores the ID of the NASA file, so anyone can redo the calculation.
 
 ```mermaid
 flowchart LR
-    E1["Stage 1 · MVP<br/>one corridor, one real measurement<br/>State agencies and NGOs"] --> E2["Stage 2 · More area<br/>up-to-date data, defects fixed"]
-    E2 --> E3["Stage 3 · For everyone<br/>more regions, farmers<br/>and rural workers"]
+    E1["Stage 1 · MVP<br/>one corridor, one real measurement<br/>State, NGOs and rescue"] --> E2["Stage 2 · More area<br/>up-to-date data, defects fixed<br/>+ farmers and rural communities"]
+    E2 --> E3["Stage 3 · For everyone<br/>more regions<br/>and more people"]
 ```
 
 ### Stage 1 · MVP (done, Space Apps 2026)
@@ -250,7 +250,7 @@ flowchart LR
 - Algorithm programmed: state per segment, rainfall since the pass (IMERG) and drying. 53 tests.
 - Audience: State agencies, NGOs and rescue operations.
 
-### Stage 2 · More area, up-to-date data and defects fixed
+### Stage 2 · More area, up-to-date data, defects fixed and farmers
 
 - **Wider audience:** farmers and rural communities join, checking their road before they leave.
 - **More area:** from the corridor to the whole province of Chaco, then to Northeast Argentina.
