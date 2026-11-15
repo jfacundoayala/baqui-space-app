@@ -36,7 +36,7 @@ export const T3 = {
     /** El título se lee junto: "El Niño ya está establecido". */
     tituloResaltado: "El Niño",
     tituloResto: " ya está establecido",
-    bajada: "Y puede intensificarse hacia fin de año y comienzos del próximo.",
+    bajada: "Puede intensificarse hacia fin de año y comienzos del próximo.",
     /** Cifras: "previo" va chico arriba, "valor" grande, "texto" abajo. Fieles a la fuente. */
     datos: [
       {
