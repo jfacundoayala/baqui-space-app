@@ -65,6 +65,11 @@ npm run dev
 
 ---
 
+## 🔬 Análisis de datos de NASA
+Los scripts que bajan y miden el radar NISAR, los tests y la hipótesis física están en [`analisis/`](analisis/README.md).
+
+---
+
 ## 📄 Guión del Pitch
 El guión cronometrado para la presentación de 3 minutos se encuentra documentado en [`docs/guion-pitch.md`](docs/guion-pitch.md).
 
