@@ -38,9 +38,13 @@ Justo cuando más llueve hay nubes, y los satélites que sacan "fotos" comunes n
 
 ## 2. Qué hace BAQUI
 
-| Para quién | Qué pregunta | Qué responde |
+| Rol | Quién | Qué obtiene |
 |---|---|---|
-| Organismos del Estado y ONG (Protección Civil, Vialidad, Cruz Roja, Cáritas) y productores | "¿Llego hoy a este lugar?" | Si el camino está **transitable o intransitable**, tramo por tramo, con el dato del radar que lo respalda |
+| **Cliente** (paga el servicio) | Organismos del Estado y ONG: Protección Civil, Vialidad, Cruz Roja, Cáritas | Menos vehículos varados y ayuda que llega a tiempo |
+| **Usuario** (consulta antes de salir) | La persona encargada de despachar: mercadería, donaciones o una ambulancia | La respuesta a "¿llego hoy a este lugar?": **transitable o intransitable**, tramo por tramo, con el dato del radar que la respalda |
+| **Beneficiados** | La gente del campo y los afectados por la lluvia y las inundaciones | Que la ayuda y los insumos lleguen a tiempo, y que la producción salga |
+
+Todos los datos que usa BAQUI son públicos y gratis. El costo del servicio (procesar y mantener el dato al día) lo pagaría el cliente.
 
 ## 3. Cómo funciona
 
@@ -69,7 +73,18 @@ Paso a paso:
 2. **Leer solo el corredor.** No se baja la escena entera (unos 1,8 GB): se lee por internet la ventana que importa (unos 43 MB).
 3. **Ubicar los caminos** con OpenStreetMap y medir solo el centro de cada uno (píxeles a 10 m o menos del eje).
 4. **Comparar** una pasada después de la lluvia con otra de referencia de la **misma órbita**, así el satélite mira desde el mismo ángulo. La diferencia es el eco extra.
-5. **Clasificar** cada tramo sumando la lluvia (IMERG), el agua en superficie (OPERA), la humedad del suelo (SMAP) y si el tramo está en un bajo o en una loma (altura del terreno).
+5. **Clasificar** cada tramo sumando la lluvia (IMERG), el agua en superficie (OPERA) y la humedad del suelo (SMAP). El algoritmo ya acepta la altura del terreno (si el tramo está en un bajo o en una loma); calcularla tramo por tramo es parte de la etapa 2.
+
+**Cómo se combinan los datos.** Cada satélite mide distinto, con otra grilla y otro horario. Para compararlos:
+
+| Dato | Resolución original | Cómo lo llevamos a BAQUI |
+|---|---|---|
+| NISAR | 20 m | Es la grilla base: todo se proyecta a ella |
+| OPERA y altura del terreno | 30 m | Se reproyectan a la grilla de NISAR |
+| IMERG | ~10 km, por día UTC | Cada tramo usa su celda; se cuenta desde el día siguiente a la pasada |
+| SMAP | 9 km, una vez por día | Promedio del corredor, para confirmar la tendencia |
+| OpenStreetMap | Líneas | Se rasterizan: eje (10 m o menos del centro) y franjas de campo para comparar |
+
 
 El detalle está en [`analisis/docs/HIPOTESIS-FISICA.md`](analisis/docs/HIPOTESIS-FISICA.md) y [`analisis/docs/ALGORITMO-BAQUI.md`](analisis/docs/ALGORITMO-BAQUI.md).
 
@@ -80,10 +95,19 @@ El detalle está en [`analisis/docs/HIPOTESIS-FISICA.md`](analisis/docs/HIPOTESI
 | **NISAR L2 GCOV** (banda L, HH y HV) | NASA-ISRO, vía ASF DAAC | Eco del radar sobre los caminos | **Medido** (números de la sección 5) |
 | **IMERG** (lluvia diaria) | NASA GPM | Lluvia desde la pasada, por tramo | Bajado y usado en el algoritmo |
 | **OPERA DSWx-S1** (agua en superficie) | NASA JPL | Control: dónde hay agua a la vista | Usado en los chequeos |
-| **SMAP** (humedad del suelo) | NASA | Humedad de la zona | Bajado |
+| **SMAP** (humedad del suelo) | NASA | Humedad de la zona | Bajado y usado como respaldo |
+| **NASADEM** (altura del terreno, 30 m) | NASA | Si el tramo está en un bajo o en una loma | Fuente por defecto en el script de descarga |
 | **Blue Marble** | NASA | Imagen de la Tierra en el globo 3D | En la web |
-| Copernicus DEM GLO-30 | ESA (no es de NASA) | Altura del terreno: bajo o loma | Bajado |
+| Copernicus DEM GLO-30 | ESA (no es de NASA) | La misma altura, para comparar | Alternativa (los chequeos actuales lo usan) |
 | OpenStreetMap | Comunidad OSM | Los caminos | Real |
+
+**Próximas fuentes (etapa 2):**
+
+| Dato | Fuente | Qué suma |
+|---|---|---|
+| **SAOCOM 1A y 1B** (banda L, 23,5 cm, 4 polarizaciones, hasta 10 m) | CONAE (Argentina) | Más pasadas en la misma banda que NISAR (cada 8 días con los dos satélites) y 4 polarizaciones para separar agua, suelo mojado y vegetación, sobre todo bajo el monte. Archivo gratis para el territorio argentino. Participa de la Carta Internacional de Desastres |
+| **CYGNSS** (humedad del suelo y agua en superficie) | NASA | Humedad cada 6 horas (grilla de 9 km) y máscara de agua diaria (1 km): dice casi a diario si la zona se mojó entre pasadas de radar |
+| **Sentinel-1 / OPERA RTC** (banda C) | ESA / NASA JPL | Más pasadas de radar para tener el dato del camino más seguido |
 
 Todos los datos son públicos y gratis. No están en el repo porque pesan varios GB: se bajan con los scripts de [`analisis/`](analisis/README.md).
 
@@ -98,6 +122,17 @@ Corredor de General San Martín (Chaco), órbita 161 ascendente, frame 164. Una 
 | Sin monte: eje del camino contra campo abierto | **+1,63 dB contra +1,57 dB** | Se mojó toda la zona, no solo el camino |
 | Puntos con agua abierta nueva | **3 de 53.611 (0,006 %)** | Mojado, no bajo agua |
 | Caminos medidos | **1.201,7 km** | Caminos rurales sin pavimento de OpenStreetMap |
+
+**Respaldo independiente.** Otros satélites y otras órbitas de NISAR cuentan la misma historia:
+
+| Fuente | Qué muestra | ¿Coincide? |
+|---|---|---|
+| **IMERG** (lluvia, NASA) | Entre las dos pasadas llovieron unos 27 mm de media sobre el corredor, en todas las celdas; el día fuerte fue el 8/10. Los 4 días antes de la pasada de referencia, 0 mm | Sí: llovió entre las pasadas y la referencia estaba seca |
+| **SMAP** (humedad del suelo, NASA) | De 0,272 m³/m³ (25/09) a **0,339 m³/m³** (11/10), el valor más alto de la serie; después baja a 0,306 (16/10) y 0,269 (19/10) | Sí: otro satélite ve el suelo mojado el mismo día, y después cómo se seca |
+| **NISAR, órbita 060 ascendente** | Eco del eje +1,08 dB, 7 días después de la lluvia | Sí: otra geometría ve lo mismo |
+| **NISAR, órbita 111 descendente** | Eco del eje +0,77 dB, 10 días después de la lluvia | Sí: sube menos porque el suelo se va secando |
+| **OPERA** (agua en superficie, NASA) | 0 % de agua nueva sobre el eje de los caminos | Sí: mojado, no bajo agua |
+| **Campo lejos de los caminos** | +0,17 dB | Sí: donde llovió menos, el eco casi no cambia |
 
 **Conclusión:** el radar ve la **zona mojada**. Cada número tiene anotado su archivo de origen en [`web/src/data/resultados.json`](web/src/data/resultados.json) (campos `_fuente`). Cualquiera lo puede verificar gratis en [ASF Vertex](https://search.asf.alaska.edu/) con el ID del archivo que da la web.
 
@@ -162,7 +197,8 @@ baqui-space-app/
 
 - **El radar mide la zona, no solo el camino.** A esta resolución el camino y el campo de alrededor suben casi igual. Por eso decimos "zona mojada".
 - **Bajo el monte no se confirma agua.** El 38,1 % del eje de los caminos tiene monte.
-- **Es una sola comparación** (un par de pasadas). Falta validarlo en el terreno.
+- **El resultado principal es un par de pasadas**, respaldado por otras dos órbitas de NISAR, SMAP e IMERG. Falta validarlo en el terreno.
+- **Una duda abierta:** un par de 14 días da -0,65 dB en la zona, pero mezcla dos versiones del procesador de NISAR, así que no se puede comparar directo.
 - **El estado por tramo y el secado día a día están programados pero no calibrados.** La demo usa agua simulada.
 - **Frecuencia:** NISAR repite órbita cada 12 días. Sobre el corredor pasaron 3 órbitas distintas en 12 días, así que hay un dato nuevo cada unos 4 días.
 - **Los productos de NISAR son provisionales** y hoy se publican con atraso.
@@ -218,6 +254,11 @@ flowchart LR
   - Medir tramo por tramo (cada 100 m) y separar mejor el camino del campo, usando las dos polarizaciones (HH y HV).
   - Bajo el monte: confirmar el agua con otras fuentes.
   - Reemplazar el agua simulada de la demo por la medición real.
+- **Armonizar los datos y dar un nivel de confianza por tramo:**
+  - Una grilla y un reloj comunes para todas las fuentes, con controles de calidad (pasadas con dato faltante, cambio de versión del procesador).
+  - Altura del terreno con NASADEM: calcular el HAND (altura sobre el drenaje más cercano) de cada tramo.
+  - Confianza **alta** cuando dos fuentes independientes coinciden (por ejemplo, NISAR más SAOCOM o dos órbitas de NISAR en los últimos 4 días) y la humedad de la zona (SMAP o CYGNSS) va para el mismo lado; **media** con una sola fuente; **baja** si se contradicen o el dato es viejo. Cada respuesta dice de cuándo es el dato.
+  - Medir los aciertos contra lo que se ve en el terreno y ajustar los umbrales con esos datos.
 - **Web en inglés y en español.**
 
 ### Etapa 3 · Más regiones y más gente
@@ -231,13 +272,11 @@ flowchart LR
 
 Las reglas de Space Apps 2026 piden contar cómo usamos la IA.
 
-| Herramienta | Para qué |
+| Quién | Qué hizo |
 |---|---|
-| **Claude Code** (Anthropic) | Escribió la mayor parte del código: la web (Next.js, globo con three.js, demo con Leaflet), los scripts de Python que bajan y miden NISAR y los documentos técnicos. Sus commits llevan `Co-Authored-By: Claude`. |
-| **Varios agentes de Claude** | Revisaron el diseño y la exactitud de los textos. Cada problema lo confirmaba un segundo agente antes de aplicar el cambio. |
-| **Modelos gratuitos** (vía FreeLLMAPI) | Leer y resumir fuentes públicas. Nunca recibieron datos privados. |
-
-**Qué hizo el equipo:** eligió el desafío, la idea y a quién le sirve; aprobó cada texto y cada cambio de diseño; pidió que cada número se cotejara contra su archivo de origen y que cada fuente se abriera antes de citarla.
+| **El equipo** | La idea, el diseño del producto, la misión y la visión, y las correcciones: decidió y aprobó cada texto y cada cambio de diseño. |
+| **IA: Claude Code** (Anthropic) | La programación: la web (Next.js, globo con three.js, demo con Leaflet) y los scripts de Python que bajan y miden NISAR. Sus commits llevan `Co-Authored-By: Claude`. También ayudó a redactar la documentación técnica a partir de lo que decidió el equipo, y a cotejar cada número contra su archivo de origen. |
+| **IA: modelos gratuitos** (vía FreeLLMAPI) | Leer y resumir fuentes públicas. Nunca recibieron datos privados. |
 
 **Qué no sale de la IA:** los números (salen de correr nuestros scripts sobre datos reales de NASA), la imagen de la Tierra (NASA Blue Marble), la foto del pie de página (foto real de Wikimedia Commons) y los caminos (OpenStreetMap). No hay imágenes generadas con IA.
 

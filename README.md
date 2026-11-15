@@ -38,9 +38,13 @@ Heavy rain comes with clouds, and satellites that take ordinary "photos" see not
 
 ## 2. What BAQUI does
 
-| For whom | What question | What it answers |
+| Role | Who | What they get |
 |---|---|---|
-| State agencies and NGOs (Civil Protection, Vialidad, Red Cross, Cáritas) and farmers | "Can I get there today?" | Whether the road is **passable or impassable**, segment by segment, with the radar data behind it |
+| **Customer** (pays for the service) | State agencies and NGOs: Civil Protection, the roads agency (Vialidad), Red Cross, Cáritas | Fewer stranded vehicles and aid that arrives on time |
+| **User** (checks before leaving) | The person in charge of dispatching: goods, donations or an ambulance | The answer to "can I get there today?": **passable or impassable**, segment by segment, with the radar data behind it |
+| **Beneficiaries** | Rural communities and people affected by rain and floods | Aid and supplies arrive on time, and production gets out |
+
+All the data BAQUI uses is public and free. The cost of the service (processing and keeping the data up to date) would be paid by the customer.
 
 ## 3. How it works
 
@@ -69,7 +73,18 @@ Step by step:
 2. **Read only the corridor.** The whole scene (about 1.8 GB) is not downloaded: the window that matters (about 43 MB) is read over the internet.
 3. **Locate the roads** with OpenStreetMap and measure only the center of each one (pixels within 10 m of the centerline).
 4. **Compare** a pass after the rain with a reference pass from the **same orbit**, so the satellite looks from the same angle. The difference is the extra echo.
-5. **Classify** each segment by adding rainfall (IMERG), surface water (OPERA), soil moisture (SMAP) and whether the segment lies in a low spot or on a rise (terrain height).
+5. **Classify** each segment by adding rainfall (IMERG), surface water (OPERA) and soil moisture (SMAP). The algorithm already accepts terrain height (whether the segment lies in a low spot or on a rise); computing it for every segment is part of stage 2.
+
+**How the data are combined.** Each satellite measures differently, on another grid and at another time. To compare them:
+
+| Data | Original resolution | How BAQUI aligns it |
+|---|---|---|
+| NISAR | 20 m | Base grid: everything is projected onto it |
+| OPERA and terrain height | 30 m | Reprojected onto the NISAR grid |
+| IMERG | ~10 km, per UTC day | Each segment uses its own cell; counted from the day after the pass |
+| SMAP | 9 km, once a day | Corridor average, to confirm the trend |
+| OpenStreetMap | Lines | Rasterized: centerline (within 10 m) and field strips for comparison |
+
 
 The details are in [`analisis/docs/HIPOTESIS-FISICA.md`](analisis/docs/HIPOTESIS-FISICA.md) and [`analisis/docs/ALGORITMO-BAQUI.md`](analisis/docs/ALGORITMO-BAQUI.md).
 
@@ -80,10 +95,19 @@ The details are in [`analisis/docs/HIPOTESIS-FISICA.md`](analisis/docs/HIPOTESIS
 | **NISAR L2 GCOV** (L-band, HH and HV) | NASA-ISRO, via ASF DAAC | Radar echo over the roads | **Measured** (numbers in section 5) |
 | **IMERG** (daily rainfall) | NASA GPM | Rainfall since the pass, per segment | Downloaded and used in the algorithm |
 | **OPERA DSWx-S1** (surface water) | NASA JPL | Control: where water is visible | Used in the checks |
-| **SMAP** (soil moisture) | NASA | Moisture of the area | Downloaded |
+| **SMAP** (soil moisture) | NASA | Moisture of the area | Downloaded and used as corroboration |
+| **NASADEM** (terrain height, 30 m) | NASA | Whether the segment lies in a low spot or on a rise | Default source in the download script |
 | **Blue Marble** | NASA | Image of the Earth on the 3D globe | On the web |
-| Copernicus DEM GLO-30 | ESA (not NASA) | Terrain height: low spot or rise | Downloaded |
+| Copernicus DEM GLO-30 | ESA (not NASA) | Same terrain height, for comparison | Alternative (used by the current checks) |
 | OpenStreetMap | OSM community | The roads | Real |
+
+**Next sources (stage 2):**
+
+| Data | Source | What it adds |
+|---|---|---|
+| **SAOCOM 1A and 1B** (L-band, 23.5 cm, 4 polarizations, down to 10 m) | CONAE (Argentina) | More passes in the same band as NISAR (every 8 days with both satellites) and 4 polarizations to separate water, wet soil and vegetation, especially under forest. Free archive for Argentine territory. Part of the International Charter on Space and Major Disasters |
+| **CYGNSS** (soil moisture and surface water) | NASA | Soil moisture every 6 hours (9 km grid) and a daily water mask (1 km): tells almost daily whether the area got wet between radar passes |
+| **Sentinel-1 / OPERA RTC** (C-band) | ESA / NASA JPL | More radar passes to get road data more often |
 
 All data are public and free. They are not in the repo because they weigh several GB: they are downloaded with the scripts in [`analisis/`](analisis/README.md).
 
@@ -98,6 +122,17 @@ General San Martín corridor (Chaco), ascending orbit 161, frame 164. A pass aft
 | Without forest: road centerline against open field | **+1.63 dB vs +1.57 dB** | The whole area got wet, not just the road |
 | Points with new open water | **3 of 53,611 (0.006%)** | Wet, not under water |
 | Roads measured | **1,201.7 km** | Unpaved rural roads from OpenStreetMap |
+
+**Independent corroboration.** Other satellites and other NISAR orbits tell the same story:
+
+| Source | What it shows | Does it agree? |
+|---|---|---|
+| **IMERG** (rainfall, NASA) | About 27 mm on average fell over the corridor between the two passes, in every cell; the heavy day was 8 Oct. The 4 days before the reference pass: 0 mm | Yes: it rained between the passes and the reference was dry |
+| **SMAP** (soil moisture, NASA) | From 0.272 m³/m³ (25 Sep) to **0.339 m³/m³** (11 Oct), the highest value in the series; then down to 0.306 (16 Oct) and 0.269 (19 Oct) | Yes: another satellite sees wet soil the same day, and then the drying |
+| **NISAR, ascending orbit 060** | Centerline echo +1.08 dB, 7 days after the rain | Yes: another geometry sees the same |
+| **NISAR, descending orbit 111** | Centerline echo +0.77 dB, 10 days after the rain | Yes: it rises less because the soil is drying |
+| **OPERA** (surface water, NASA) | 0% new water on the road centerline | Yes: wet, not under water |
+| **Field far from the roads** | +0.17 dB | Yes: where it rained less, the echo barely changes |
 
 **Conclusion:** the radar sees the **wet area**. Each number has its source file noted in [`web/src/data/resultados.json`](web/src/data/resultados.json) (`_fuente` fields). Anyone can verify it for free in [ASF Vertex](https://search.asf.alaska.edu/) with the file ID given by the web.
 
@@ -162,7 +197,8 @@ baqui-space-app/
 
 - **The radar measures the area, not just the road.** At this resolution the road and the surrounding field rise almost equally. That is why we say "wet area".
 - **Water under forest is not confirmed.** 38.1% of the road centerline has forest.
-- **It is a single comparison** (one pair of passes). It still needs validation on the ground.
+- **The main result is one pair of passes**, backed by two other NISAR orbits, SMAP and IMERG. It still needs validation on the ground.
+- **One open question:** a 14-day pair gives -0.65 dB over the area, but it mixes two versions of the NISAR processor, so it cannot be compared directly.
 - **The state per segment and the day-by-day drying are programmed but not calibrated.** The demo uses simulated water.
 - **Frequency:** NISAR repeats its orbit every 12 days. Over the corridor, 3 different orbits passed in 12 days, so there is new data about every 4 days.
 - **NISAR products are provisional** and are currently published with a delay.
@@ -218,6 +254,11 @@ flowchart LR
   - Measure segment by segment (every 100 m) and better separate the road from the field, using both polarizations (HH and HV).
   - Under forest: confirm water with other sources.
   - Replace the simulated water in the demo with the real measurement.
+- **Harmonize the data and give a confidence level per segment:**
+  - A common grid and clock for every source, with quality checks (passes with missing data, processor version changes).
+  - Terrain height with NASADEM: compute HAND (height above the nearest drainage) for every segment.
+  - **High** confidence when two independent sources agree (for example NISAR plus SAOCOM, or two NISAR orbits in the last 4 days) and area moisture (SMAP or CYGNSS) points the same way; **medium** with a single source; **low** if they contradict each other or the data is old. Every answer says how old its data is.
+  - Measure hits against what is seen on the ground and tune the thresholds with that data.
 - **Web in English and Spanish.**
 
 ### Stage 3 · More regions and more people
@@ -231,13 +272,11 @@ flowchart LR
 
 The Space Apps 2026 rules ask us to state how we used AI.
 
-| Tool | Used for |
+| Who | What they did |
 |---|---|
-| **Claude Code** (Anthropic) | Wrote most of the code: the web (Next.js, three.js globe, Leaflet demo), the Python scripts that download and measure NISAR, and the technical documents. Its commits carry `Co-Authored-By: Claude`. |
-| **Several Claude agents** | Reviewed the design and the accuracy of the texts. Each problem was confirmed by a second agent before the change was applied. |
-| **Free models** (via FreeLLMAPI) | Reading and summarizing public sources. They never received private data. |
-
-**What the team did:** chose the challenge, the idea and who it serves; approved every text and every design change; asked that every number be checked against its source file and that every source be opened before citing it.
+| **The team** | The idea, the product design, the mission and vision, and the corrections: decided and approved every text and every design change. |
+| **AI: Claude Code** (Anthropic) | The programming: the web (Next.js, three.js globe, Leaflet demo) and the Python scripts that download and measure NISAR. Its commits carry `Co-Authored-By: Claude`. It also helped draft the technical documentation from the team's decisions, and checked every number against its source file. |
+| **AI: free models** (via FreeLLMAPI) | Reading and summarizing public sources. They never received private data. |
 
 **What does not come from AI:** the numbers (they come from running our scripts on real NASA data), the image of the Earth (NASA Blue Marble), the footer photo (a real photo from Wikimedia Commons) and the roads (OpenStreetMap). There are no AI-generated images.
 

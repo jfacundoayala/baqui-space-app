@@ -2,10 +2,12 @@
 
 - OPERA DSWx-S1: mapa de agua ya hecho por la NASA (solo la banda de agua, B01_WTR).
 - IMERG: lluvia diaria (versión "Late", unas 14 h de atraso). Se lee solo la ventana.
-- Copernicus DEM GLO-30: altura del terreno (para sacar el HAND: bajo o loma).
+- NASADEM (NASA, 30 m): altura del terreno, para saber si un tramo está en un bajo o en una loma (HAND).
+  Es la fuente de altura por defecto: así todos los datos del análisis son de NASA.
+- Copernicus DEM GLO-30 (ESA, 30 m): la misma altura, como alternativa y para comparar ("dem").
 - SMAP: humedad del suelo (microondas banda L, 9 km, diaria).
 
-Uso: python -m baqui.bajar_capas [opera|imerg|dem|smap ...]  (sin nada, baja todo)
+Uso: python -m baqui.bajar_capas [opera|imerg|nasadem|dem|smap ...]  (sin nada, baja todo)
 """
 import json
 import sys
@@ -64,23 +66,34 @@ def imerg():
     print("IMERG listo:", archivo)
 
 
-def dem():
+def _altura(coleccion, carpeta, asset):
+    """Baja las hojas de altura del terreno que tocan BBOX desde Planetary Computer (sin cuenta)."""
     import planetary_computer
     import pystac_client
     import urllib.request
-    out = RAIZ / "dem"
+    out = RAIZ / carpeta
     out.mkdir(parents=True, exist_ok=True)
     cat = pystac_client.Client.open("https://planetarycomputer.microsoft.com/api/stac/v1",
                                     modifier=planetary_computer.sign_inplace)
-    items = list(cat.search(collections=["cop-dem-glo-30"], bbox=BBOX).items())
-    print(f"DEM: {len(items)} hojas")
+    items = list(cat.search(collections=[coleccion], bbox=BBOX).items())
+    print(f"{coleccion}: {len(items)} hojas")
     for it in items:
         destino = out / f"{it.id}.tif"
         if not destino.exists():
             parcial = destino.with_suffix(".part")
-            urllib.request.urlretrieve(it.assets["data"].href, parcial)
+            urllib.request.urlretrieve(it.assets[asset].href, parcial)
             parcial.rename(destino)  # solo queda .tif si bajó entero
         print("  ", destino.name, round(destino.stat().st_size / 1e6, 1), "MB")
+
+
+def nasadem():
+    # NASADEM: SRTM reprocesado por NASA (cubre de 56° S a 60° N; el corredor son 4 hojas de 1°).
+    _altura("nasadem", "nasadem", "elevation")
+
+
+def dem():
+    # Copernicus GLO-30 (ESA): alternativa a NASADEM. Los chequeos de 15/11 se corrieron con este.
+    _altura("cop-dem-glo-30", "dem", "data")
 
 
 def _ventana_ease9():
@@ -164,9 +177,9 @@ def smap(procesos=6):
 
 
 if __name__ == "__main__":
-    pedidos = sys.argv[1:] or ["dem", "opera", "imerg", "smap"]
+    pedidos = sys.argv[1:] or ["nasadem", "opera", "imerg", "smap"]
     for p in pedidos:
         try:
-            {"opera": opera, "imerg": imerg, "dem": dem, "smap": smap}[p]()
+            {"opera": opera, "imerg": imerg, "nasadem": nasadem, "dem": dem, "smap": smap}[p]()
         except Exception as e:  # que una fuente caída no frene a las otras
             print(f"ERROR en {p}: {type(e).__name__}: {e}")
