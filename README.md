@@ -1,56 +1,69 @@
 # BAQUI — Monitoreo Satelital SAR de Caminos Rurales
 
 > **NASA Space Apps Challenge 2026** · Track: *Dancing with the SARs*  
-> **One-liner:** Baqui es un sistema de alerta temprana que utiliza radar de apertura sintética (SAR) para prevenir daños frente al fenómeno de El Niño, permitiendo saber si un camino rural está transitable antes de salir al barro.
+> **Repositorio Oficial:** [github.com/thomasskarp/baqui-space-app](https://github.com/thomasskarp/baqui-space-app)
 
 ---
 
-## 🎯 El Problema y el 'Why Now' (El Niño)
-Durante el fenómeno de El Niño, el Noreste Argentino (NEA) sufre precipitaciones extremas que anegan caminos rurales de tierra.
-* **La falla de los satélites convencionales:** Las tormentas traen semanas continuas de nubosidad total, cegando por completo a los sensores ópticos (Sentinel-2, Landsat).
-* **La solución SAR:** El Radar de Apertura Sintética (SAR) emite pulsos de microondas que **atraviesan las nubes día y noche**, detectando el agua acumulada sobre la traza vial por su comportamiento especular.
+## 1. ¿Qué es y qué problema resuelve?
+> **"Baqui es un sistema que da información para prevenir daños frente al fenómeno de El Niño. Te dice cómo está el camino rural, para que decidas si salir sin tener que ir hasta ahí a mirar."**
+
+* **El desafío físico:** Durante El Niño, la nubosidad y tormentas son constantes. Los satélites ópticos tradicionales (Sentinel-2, Landsat) quedan **completamente ciegos** ante las nubes.
+* **La tecnología SAR:** El Radar de Apertura Sintética (SAR, Sentinel-1) emite pulsos de microondas que **atraviesan la cobertura nubosa día y noche**, detectando el agua acumulada sobre la calzada rural gracias a su baja retrodispersión especular.
+* **Desarrollo asociado (View 1):** Visor interactivo de caminos estilo PUNA con selector de capa óptica vs. Radar SAR y estado de transitabilidad en tiempo real.
 
 ---
 
-## 👥 Cliente Ideal (ICP) y Dolores Críticos
-* **Organismos del Estado:** Protección Civil, Vialidad Provincial, Municipios rurales.
-* **Organizaciones Humanitarias y ONGs:** Cáritas, Cruz Roja, Bomberos Voluntarios.
+## 2. El Cliente Ideal y los 3 Dolores Reales
+Nuestros clientes y usuarios clave son los organismos públicos y las organizaciones que deben responder ante emergencias:
+* **Organismos del Estado:** Protección Civil provincial y municipal, Direcciones de Vialidad Provincial, Ministerios de Salud.
+* **Organizaciones Humanitarias y ONGs:** Cáritas Argentina, Cruz Roja Argentina, Bomberos Voluntarios.
 
-### Los 3 Dolores Clave:
-1. **Salud:** Ambulancias volcadas o atascadas en el lodo; aislamiento de puestos sanitarios.
-2. **Logística Humanitaria:** Camiones con donaciones y víveres que no llegan a los evacuados.
-3. **Tiempo y Dinero:** Productores agropecuarios sin poder sacar la cosecha ni la leche; maestros y escuelas rurales incomunicadas.
-
----
-
-## 🖥️ Estructura de la Solución (3 Vistas)
-
-| Vista | Responsable | Propósito |
-|---|---|---|
-| **View 1: Visor de Caminos** (web/src/views/1-visor) | Dev 1 | Mapa interactivo estilo Puna con trazado del camino rural y capa de Radar SAR que 've' el agua a través de las nubes. |
-| **View 2: Panel de Operaciones** (web/src/views/2-operaciones) | Dev 2 | Consola para Protección Civil y ONGs que ejemplifica el problema actual: despacho de vehículos a ciegas sin datos de transitabilidad. |
-| **View 3: El Niño e Impacto** (web/src/views/3-impacto) | Dev 3 | Pantalla con los 3 recuadros de dolor (Salud, Donaciones, Pérdidas Económicas) y el disparador de urgencia. |
+### Los 3 Dolores Críticos:
+1. **Despacho a ciegas:** No tienen forma de saber si un camino de tierra está cortado antes de enviar una unidad.
+2. **Pérdida y daño de vehículos:** Ambulancias y camiones de auxilio volcados o varados en el lodo.
+3. **Incertidumbre en tiempos de respuesta:** Desvíos imprevistos que retrasan la asistencia médica y humanitaria en momentos críticos.
+* **Desarrollo asociado (View 2):** Consola de despacho y gestión de contingencia para Protección Civil y ONGs que ejemplifica el riesgo operativo actual.
 
 ---
 
-## 🚀 Cómo Ejecutar el Proyecto
-`ash
+## 3. El "Why Now" / Disparador de Urgencia - EL NIÑO
+> **"El Fenómeno El Niño llega a su pico crítico entre noviembre y diciembre sobre el NEA, con lluvias récord (+209%) y caminos rurales anegados. Las provincias están actualizando sus planes de contingencia hoy. BAQUI llega cuando más se necesita para prevenir desastres en Salud, Logística, Tiempo y Dinero."**
+
+### Las 3 Crisis que Atacamos (Recuadros de Dolor):
+1. **SALUD (Recuadro 1):** Ambulancias volcadas o atascadas en el fango; puestos sanitarios y parajes aislados sin auxilio.
+2. **LOGÍSTICA HUMANITARIA (Recuadro 2):** Camiones con víveres y donaciones de Cáritas/Cruz Roja detenidos por cortes de agua. La ayuda no llega a los evacuados.
+3. **TIEMPO Y DINERO / ECONOMÍA (Recuadro 3):** Productores de soja, algodón y tambos lácteos sin poder sacar su producción; maestros y escuelas rurales incomunicadas con pérdidas millonarias.
+* **Desarrollo asociado (View 3):** Pantalla de impacto con los 3 recuadros de dolor, alertas de El Niño y la barra de navegación general entre vistas.
+
+---
+
+## 🗺️ Mapa de Desarrollo y Responsables
+
+| Punto del Pitch | Vista | Responsable | Carpeta de Trabajo |
+|---|---|---|---|
+| **1. ¿Qué es y qué resuelve?** | View 1: Visor SAR | Dev 1 | `web/src/views/1-visor/` |
+| **2. Cliente Ideal y 3 Dolores** | View 2: Operaciones | Dev 2 | `web/src/views/2-operaciones/` |
+| **3. Why Now: El Niño** | View 3: Impacto & Nav | Dev 3 | `web/src/views/3-impacto/` |
+
+---
+
+## 🚀 Cómo Empezar
+
+```bash
 # 1. Clonar el repositorio
-git clone <URL_DEL_REPOSITORIO>
+git clone https://github.com/thomasskarp/baqui-space-app.git
 cd baqui-space-app
 
-# 2. Navegar a la carpeta web
+# 2. Navegar a la app web
 cd web
 
-# 3. Instalar dependencias y levantar el servidor
+# 3. Instalar y correr
 npm install
 npm run dev
-`
+```
 
 ---
 
-## 👥 Equipo y Distribución de Tareas
-* **Coordinación General:** Tomas Skarp
-* **Desarrollo View 1 (Visor SAR):** Asignado a Dev 1
-* **Desarrollo View 2 (Operaciones Estado/ONG):** Asignado a Dev 2
-* **Desarrollo View 3 (Impacto El Niño & Nav):** Asignado a Dev 3
+## 📄 Guión del Pitch
+El guión cronometrado para la presentación de 3 minutos se encuentra documentado en [`docs/guion-pitch.md`](docs/guion-pitch.md).
