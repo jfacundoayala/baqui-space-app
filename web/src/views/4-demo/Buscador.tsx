@@ -1,7 +1,7 @@
 "use client";
 // Los dos recuadros tipo buscador: [Gral. San Martín] → [¿Hacia dónde?]. En el celular, sin la flecha. En una sola fila, también en 375 px.
 // El origen va siempre entero. En el celular el nombre del destino puede ir en 2 renglones (alto reservado, así
-// el mapa no salta); en escritorio el panel mide 456 px y entra entero en uno, "Paraje Laguna El Lobo" incluido.
+// el mapa no salta); en escritorio la barra mide 576 px y entra entero en uno, "Paraje Laguna El Lobo" incluido.
 import { ArrowRight, Check, ChevronDown, MapPin } from "lucide-react";
 import { useEffect, useId, useRef, useState } from "react";
 import type { Destino } from "./datos";
@@ -62,11 +62,11 @@ export default function Buscador({
       ref={caja}
       role="group"
       aria-label={T4.buscador.etiqueta}
-      className="glass relative z-30 grid grid-cols-[auto_minmax(0,1fr)] items-stretch gap-1 sm:grid-cols-[auto_auto_minmax(0,1fr)] sm:gap-0 rounded-2xl p-1.5"
+      className="glass relative z-30 grid grid-cols-2 items-stretch gap-1 rounded-2xl p-1.5 sm:grid-cols-[minmax(0,1fr)_auto_minmax(0,1fr)] sm:gap-1"
     >
       {/* Desde: fijo. No se achica: "Gral. San Martín" siempre entero; el que se corta, si hace falta, es el destino. */}
       {/* Texto centrado en cada caja, igual que la respuesta (pedido de Facundo, 15/11). */}
-      <div className="flex shrink-0 flex-col items-center justify-center rounded-xl px-2 py-2 text-center sm:px-3.5">
+      <div className="flex min-w-0 flex-col items-center justify-center rounded-xl px-2 py-2 text-center sm:px-3.5">
         <span className="text-xs text-ink-3">{T4.buscador.desde}</span>
         <span className="mt-0.5 flex items-center gap-1.5 whitespace-nowrap text-sm font-medium text-ink sm:gap-2 sm:text-[15px]">
           <span aria-hidden className="size-2 shrink-0 rounded-full bg-accent shadow-[0_0_0_3px_rgb(124_196_255/0.2)]" />

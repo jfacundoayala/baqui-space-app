@@ -151,7 +151,7 @@ export default function Demo() {
         <div className="mt-3 flex flex-col gap-2 sm:mt-6 sm:gap-3 lg:relative lg:mt-7 lg:block lg:h-[min(62svh,720px)] lg:min-h-[548px]">
           {/* Consulta: desde → hacia + Consultar */}
           {/* En escritorio: una barra centrada arriba del mapa, buscador y Consultar en la misma fila (pedido de Facundo, 15/11). */}
-          <div className="relative z-20 order-1 flex flex-col gap-2 lg:absolute lg:left-1/2 lg:top-4 lg:grid lg:-translate-x-1/2 lg:grid-cols-[456px_auto]">
+          <div className="relative z-20 order-1 flex flex-col gap-2 lg:absolute lg:left-1/2 lg:top-4 lg:grid lg:-translate-x-1/2 lg:grid-cols-[576px_auto]">
             <Buscador destinos={DATOS.destinos} elegido={destino} onElegir={elegir} />
             <button
               type="button"
@@ -245,7 +245,7 @@ export default function Demo() {
             />
 
             {/* Aviso: el agua es simulada (siempre visible) */}
-            <div className="pointer-events-none absolute left-3 top-3 z-20 flex flex-col items-start gap-2 lg:left-auto lg:right-3 lg:items-end">
+            <div className="pointer-events-none absolute left-3 top-3 z-20 flex flex-col items-start gap-2 lg:bottom-3 lg:top-auto">
               <p className="inline-flex items-center gap-2 rounded-full border border-warn/45 bg-[#1a1408]/85 px-3 py-1.5 text-xs font-semibold text-warn shadow-[0_8px_24px_-8px_rgb(0_0_0/0.7)] backdrop-blur-md opaco:bg-[#1a1408]">
                 <FlaskConical aria-hidden className="size-3.5" strokeWidth={2.25} />
                 {T4.mapa.datosPrueba}
