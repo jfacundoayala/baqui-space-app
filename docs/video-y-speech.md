@@ -75,7 +75,7 @@ La demo ya abre en Colonia Villa Jardín, así que el primer cartel verde está 
 | 25–28 | Scroll corto a la sección 5: **"El radar ve la zona mojada."**, el rótulo "Zona mojada" y el número grande **"+1,35 dB"** de eco extra | "+1.35 dB: the radar echo rose over the dirt roads and their surroundings. The area got wet." | "NASA's NISAR radar already sees the wet area." | La música vuelve |
 | 28–30 | "Verificalo gratis en ASF Vertex" + logo BAQUI | "Check it for free." | "Check it for free." | Acorde final y corte |
 
-**Antes de grabar:** esperar el aviso de que se publicó la versión final de la sección 4 (otra sesión todavía edita el mapa; las respuestas y los km no cambian) y confirmar en https://baqui-six.vercel.app las 3 respuestas de arriba.
+**Antes de grabar:** esperar el aviso de que se publicó la versión final de la sección 4 (otra sesión todavía edita el mapa; las respuestas y los km no cambian) y confirmar en https://baqui-nasa.vercel.app las 3 respuestas de arriba.
 
 **Sección 5 (decidido por Facundo, 15/11):** "Zona mojada" (antes "Suelo mojado"). El radar no separa el camino de su entorno: el eco subió sobre los caminos de tierra y el campo de alrededor. El número principal es "+1,35 dB" de eco extra: la mediana de todo el eje de tierra, con monte incluido. Los +1,63 dB (eje sin monte) y +1,57 dB (campo abierto) no van en la web ni en el video: solo justifican decir "zona" y no "camino". Se sacaron "23 km intransitables" (salía de una sospecha, no de un corte confirmado) y "Con barro 714,8 km".
 

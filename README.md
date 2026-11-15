@@ -1,6 +1,7 @@
 # BAQUI — Monitoreo Satelital SAR de Caminos Rurales
 
 > **NASA Space Apps Challenge 2026** · Track: *Dancing with the SARs*  
+> **Web:** [baqui-nasa.vercel.app](https://baqui-nasa.vercel.app)  
 > **Repositorio Oficial:** [github.com/thomasskarp/baqui-space-app](https://github.com/thomasskarp/baqui-space-app)
 
 ---

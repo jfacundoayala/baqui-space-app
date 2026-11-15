@@ -4,9 +4,9 @@ import { GeistMono } from "geist/font/mono";
 import "./globals.css";
 
 export const metadata: Metadata = {
-  title: "Baqui · ¿Está transitable el camino?",
+  title: "Baqui · El estado de los caminos rurales, visto desde el satélite",
   description:
-    "Después de la lluvia, nadie sabe si los caminos rurales están transitables. Baqui te lo dice, con el radar NISAR de la NASA.",
+    "Baqui muestra si un camino rural está transitable después de la lluvia, con el radar NISAR de la NASA, que ve a través de las nubes.",
 };
 
 export const viewport: Viewport = {
