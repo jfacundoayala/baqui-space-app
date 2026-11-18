@@ -5,6 +5,7 @@
 | [`hipotesis-fisica.md`](hipotesis-fisica.md) | Qué le pasa al camino con la lluvia, cómo lo ve el radar, lo que medimos y lo que todavía no se puede afirmar |
 | [`algoritmo.md`](algoritmo.md) | Del radar a la respuesta, paso a paso |
 | [`clasificacion-semaforo.md`](clasificacion-semaforo.md) | Las reglas que deciden el estado de cada tramo |
+| [`verificacion-numeros.md`](verificacion-numeros.md) | Los números de la web, recalculados desde los datos de la NASA |
 | [`mvp-caminos.md`](mvp-caminos.md) | Alcance del prototipo |
 | [`escalabilidad.md`](escalabilidad.md) | Cuentas, arquitectura y almacenamiento para llevarlo a producción (en inglés) |
 | [`recursos-radar.md`](recursos-radar.md), [`repos-nasa-radar.md`](repos-nasa-radar.md) | Fuentes y herramientas de radar que revisamos |

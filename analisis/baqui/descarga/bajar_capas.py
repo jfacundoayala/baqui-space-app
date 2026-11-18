@@ -22,7 +22,7 @@ RAIZ = Path(__file__).resolve().parents[2] / "datos"
 
 def opera():
     import earthaccess
-    earthaccess.login(strategy="netrc")
+    earthaccess.login()
     out = RAIZ / "opera"
     out.mkdir(parents=True, exist_ok=True)
     res = earthaccess.search_data(short_name="OPERA_L3_DSWX-S1_V1",
@@ -38,7 +38,7 @@ def opera():
 def imerg():
     import earthaccess
     import h5py
-    earthaccess.login(strategy="netrc")
+    earthaccess.login()
     out = RAIZ / "imerg"
     out.mkdir(parents=True, exist_ok=True)
     res = earthaccess.search_data(short_name="GPM_3IMERGDL", version="07",
@@ -125,7 +125,7 @@ def _leer_smap(url):
     """Lee un día de SMAP (archivo remoto) y devuelve la media del corredor, mañana y tarde."""
     import earthaccess
     import h5py
-    earthaccess.login(strategy="netrc")
+    earthaccess.login()
     filas, cols = _ventana_ease9()
     fila = {}
     with h5py.File(earthaccess.open([url], show_progress=False)[0], "r") as h:
@@ -147,7 +147,7 @@ def smap(procesos=6):
     """
     from concurrent.futures import ProcessPoolExecutor, as_completed
     import earthaccess
-    earthaccess.login(strategy="netrc")
+    earthaccess.login()
     out = RAIZ / "smap"
     out.mkdir(parents=True, exist_ok=True)
     archivo = out / "humedad_diaria_corredor.json"

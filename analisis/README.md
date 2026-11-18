@@ -37,7 +37,9 @@ Para bajar datos hace falta una cuenta gratis de [NASA Earthdata](https://urs.ea
 
 ```bash
 python -m baqui.descarga.login_earthdata   # pide usuario y contraseña una vez; los guarda en tu compu, no en el repo
+                                           # (o definí las variables EARTHDATA_USERNAME y EARTHDATA_PASSWORD)
 python -m baqui.descarga.bajar_nisar       # baja solo la ventana del corredor
+python -m baqui.descarga.bajar_osm         # caminos de OpenStreetMap (sin cuenta)
 python -m baqui.descarga.bajar_capas       # OPERA, IMERG, elevación y SMAP (o una sola: opera, imerg, dem, smap)
 python -m baqui.lluvia 2026-09-25 2026-11-15   # grilla diaria de lluvia IMERG entre esas fechas
 # Mide cada tramo comparando una pasada con la de referencia de la misma órbita:

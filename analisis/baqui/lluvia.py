@@ -23,7 +23,7 @@ CARPETA = RAIZ / "imerg" / "grilla"
 def bajar(desde="2026-09-25", hasta="2026-11-15"):
     import earthaccess
     import h5py
-    earthaccess.login(strategy="netrc")
+    earthaccess.login()
     CARPETA.mkdir(parents=True, exist_ok=True)
     res = earthaccess.search_data(short_name="GPM_3IMERGDL", version="07", bounding_box=BBOX,
                                   temporal=(desde, hasta))
