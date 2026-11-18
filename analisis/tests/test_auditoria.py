@@ -1,4 +1,3 @@
-import csv, io
 from baqui.auditoria import auditar, piso, casos_necesarios, informe
 from baqui.sensibilidad import sensibilidad
 from baqui.clasificador import Tramo

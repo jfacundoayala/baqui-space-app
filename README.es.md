@@ -166,8 +166,8 @@ pnpm dev        # http://localhost:3000
 
 ```bash
 cd analisis
-pip install -r requirements.txt
-python -m pytest -q tests   # 53 tests, no necesitan los datos
+pip install -r requirements.txt   # Python 3.12+
+python -m pytest -q tests   # 56 tests, no necesitan los datos
 ```
 
 Para bajar los datos de NASA hace falta una cuenta gratis de [NASA Earthdata](https://urs.earthdata.nasa.gov/). Los comandos están en [`analisis/README.md`](analisis/README.md).
@@ -183,7 +183,7 @@ baqui-space-app/
 ├── analisis/               La ciencia (Python)
 │   ├── baqui/              Descarga, medición, clasificación, lluvia y secado
 │   ├── baqui/chequeos/     Controles que generan los números de la web
-│   ├── tests/              53 tests
+│   ├── tests/              56 tests
 │   ├── db/                 Esquema de la base (PostgreSQL + PostGIS)
 │   └── docs/               Hipótesis física, algoritmo y reglas del estado de cada tramo
 └── docs/                   Guion del pitch y del video, y escalabilidad
@@ -247,7 +247,7 @@ flowchart LR
 - Medición real de NISAR sobre **1.201,7 km** de caminos rurales del corredor de General San Martín (Chaco): **+1,35 dB**, zona mojada.
 - La hipótesis física probada en una comparación (pasada después de la lluvia contra una de referencia de la misma órbita).
 - Web con la demo "¿Llegás hoy?" sobre caminos reales (agua simulada), verificable gratis en ASF Vertex.
-- Algoritmo programado: estado por tramo, lluvia desde la pasada (IMERG) y secado. 53 tests.
+- Algoritmo programado: estado por tramo, lluvia desde la pasada (IMERG) y secado. 56 tests.
 - Público: organismos del Estado, ONG y operaciones de rescate.
 
 ### Etapa 2 · Más superficie, datos al día, defectos corregidos y productores

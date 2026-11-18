@@ -3,7 +3,8 @@
 Cada pasada se compara con una referencia seca DE SU MISMA ÓRBITA.
 Uso: python -m baqui.secado
 """
-import json, os
+from pathlib import Path
+import json
 import numpy as np
 from scipy.ndimage import median_filter
 from pyproj import Transformer
@@ -29,7 +30,7 @@ def cargar(nombre):
 
 
 def caminos_osm():
-    rd = json.load(open("datos/osm/roads.json", encoding="utf-8"))
+    rd = json.loads(Path("datos/osm/roads.json").read_text(encoding="utf-8"))
     return {e["id"]: e["geometry"] for e in rd["elements"] if e.get("type") == "way" and "geometry" in e}
 
 
@@ -59,7 +60,7 @@ def main():
         ok = v > 0.05
         pend = np.polyfit(t[ok], np.log(v[ok]), 1)[0]
         print(f"media vida ({etiqueta}): {np.log(0.5) / pend:.1f} días" if pend < 0 else f"{etiqueta}: no baja")
-    json.dump(filas, open(f"{D}/secado.json", "w"), indent=1)
+    Path(f"{D}/secado.json").write_text(json.dumps(filas, indent=1), encoding="utf-8")
 
 
 if __name__ == "__main__":

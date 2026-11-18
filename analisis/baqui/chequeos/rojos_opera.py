@@ -1,4 +1,5 @@
 """Chequea los tramos rojos (R2) con la polarización y con OPERA; lagunas por OPERA; anillo de campo. Solo lectura."""
+from pathlib import Path
 import json, glob, os
 import numpy as np
 from scipy.ndimage import median_filter
@@ -48,7 +49,7 @@ def opera(fecha):
     return acc
 op0, op1 = opera("20261001"), opera("20261013")
 
-g = json.load(open(f"{R}/nisar/tramos_20261011_161A164.geojson", encoding="utf-8"))
+g = json.loads(Path(f"{R}/nisar/tramos_20261011_161A164.geojson").read_text(encoding="utf-8"))
 rojos, todos = [], []
 for f in g["features"]:
     geo = stransform(lambda a, b, c=None: tr(a, b), shp(f["geometry"]))
@@ -103,7 +104,7 @@ OUT["laguna_opera_ambas_fechas"] = {"px": int(lag.sum()), "km2": round(lag.sum()
 OUT["agua_por_hh0<-18_y_no_opera"] = round(float(np.median(dH[siempre & (op0 == 0)])), 2)
 
 # anillo de campo 300-1000 m dentro de la zona de caminos, para comparar con el eje
-rd = json.load(open(f"{R}/osm/roads.json", encoding="utf-8"))
+rd = json.loads(Path(f"{R}/osm/roads.json").read_text(encoding="utf-8"))
 ln = [LineString([tr(p["lon"], p["lat"]) for p in w["geometry"]]) for w in rd["elements"]
       if w.get("type") == "way" and len(w.get("geometry", [])) > 1]
 an = ras(ln, 1000) & ~ras(ln, 300) & ok
@@ -111,5 +112,5 @@ OUT["campo_300a1000m_corredor"] = {"px": int(an.sum()), "dHH": round(float(np.me
                                    "dHH_abierto": round(float(np.median(dH[an & ~monte])), 2),
                                    "dHV_abierto": round(float(np.median(dV[an & ~monte])), 2),
                                    "pct_dHH_baja_3_y_hh1<-18": round(100 * float(((dH <= -3) & (hh1 < -18))[an].mean()), 3)}
-json.dump(OUT, open(f"{R}/chequeos/salida_rojos.json", "w", encoding="utf-8"), indent=1)
+Path(f"{R}/chequeos/salida_rojos.json").write_text(json.dumps(OUT, indent=1), encoding="utf-8")
 print(json.dumps(OUT, indent=1))

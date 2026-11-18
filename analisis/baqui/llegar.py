@@ -11,8 +11,13 @@ eslabón más débil del viaje), y desempata por distancia.
 """
 import networkx as nx
 
-GRAVEDAD = {"transitable": 0, "con barro": 1, "sin dato": 2, "intransitable": 3}
+GRAVEDAD = {"transitable": 0, "con barro": 1, "sin dato": 2, "dato viejo": 2, "intransitable": 3}
 RESPUESTA = {0: "llegás", 1: "llegás con barro", 2: "sin dato", 3: "no llegás"}
+
+
+def _gravedad(color):
+    """Un color desconocido cuenta como 'sin dato': nunca como transitable."""
+    return GRAVEDAD.get(color, GRAVEDAD["sin dato"])
 
 
 def mejor_recorrido(G: nx.Graph, origen, destino):
@@ -20,13 +25,13 @@ def mejor_recorrido(G: nx.Graph, origen, destino):
     if origen not in G or destino not in G:
         raise ValueError("el origen o el destino no están en el mapa de caminos")
     for nivel in range(4):
-        H = nx.subgraph_view(G, filter_edge=lambda u, v, *k: GRAVEDAD[_dato(G, u, v, k)["color"]] <= nivel)
+        H = nx.subgraph_view(G, filter_edge=lambda u, v, *k, nivel=nivel: _gravedad(_dato(G, u, v, k)["color"]) <= nivel)
         try:
             camino = nx.shortest_path(H, origen, destino, weight="largo_m")
         except nx.NetworkXNoPath:
             continue
         tramos = list(zip(camino, camino[1:]))
-        peor = max(tramos, key=lambda t: GRAVEDAD[_dato(G, *t, ())["color"]])
+        peor = max(tramos, key=lambda t: _gravedad(_dato(G, *t, ())["color"]))
         largo = sum(_dato(G, *t, ())["largo_m"] for t in tramos)
         return {"respuesta": RESPUESTA[nivel], "nodos": camino, "largo_m": largo,
                 "tramo_peor": peor, "color_peor": _dato(G, *peor, ())["color"]}
@@ -39,5 +44,5 @@ def _dato(G, u, v, k):
     if G.is_multigraph():
         if k:
             return d[k[0]]
-        return min(d.values(), key=lambda e: GRAVEDAD[e["color"]])
+        return min(d.values(), key=lambda e: _gravedad(e["color"]))
     return d

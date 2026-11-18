@@ -1,5 +1,5 @@
 import networkx as nx
-from baqui.estado import evolucionar, desde_radar, manana_sin_lluvia, Parametros, ROJO, AMARILLO, VERDE, SIN_DATO
+from baqui.estado import color, dias_hasta_pasar, evolucionar, desde_radar, manana_sin_lluvia, ROJO, AMARILLO, VERDE, SIN_DATO
 from baqui.llegar import mejor_recorrido
 
 F = [f"{d}/10" for d in range(11, 21)]
@@ -99,3 +99,22 @@ def test_un_solo_camino_vale_su_peor_tramo():
         G[u][v].update(color=c, largo_m=1000)
     r = mejor_recorrido(G, "ruta", "campo")
     assert r["respuesta"] == "llegás con barro" and r["tramo_peor"] == ("t1", "t2")
+
+
+def test_indice_roto_nunca_es_transitable():
+    for roto in (float("nan"), float("inf"), None):
+        assert color(roto) == SIN_DATO
+    s = evolucionar(F[:3], [0, 0, 0], {"11/10": desde_radar(float("nan"))})
+    assert all(d.color == SIN_DATO for d in s.dias)
+    assert manana_sin_lluvia(s.hoy) == SIN_DATO and dias_hasta_pasar(s.hoy) is None
+
+
+def test_dato_viejo_cuenta_como_sin_dato():
+    r = mejor_recorrido(red(["dato viejo", "intransitable", "transitable"]), "R", "D")
+    assert r["respuesta"] == "sin dato" and r["color_peor"] == "dato viejo"
+
+
+def test_prefiere_verde_a_dato_viejo_y_color_desconocido_no_rompe():
+    r = mejor_recorrido(red(["dato viejo", "transitable", "transitable"]), "R", "D")
+    assert r["respuesta"] == "llegás" and r["nodos"] == ["R", "A", "B", "D"]
+    assert mejor_recorrido(red(["???", "intransitable", "transitable"]), "R", "D")["respuesta"] == "sin dato"

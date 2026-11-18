@@ -26,11 +26,11 @@ Los datos **no están en el repo** (son varios GB): se bajan con los scripts y q
 
 ```bash
 cd analisis
-python -m venv .venv
+python -m venv .venv          # hace falta Python 3.12 o más nuevo
 .venv/Scripts/activate      # en Linux o Mac: source .venv/bin/activate
 pip install -r requirements.txt
 
-python -m pytest -q tests   # 53 tests, no necesitan los datos
+python -m pytest -q tests   # 56 tests, no necesitan los datos
 ```
 
 Para bajar datos hace falta una cuenta gratis de [NASA Earthdata](https://urs.earthdata.nasa.gov/):

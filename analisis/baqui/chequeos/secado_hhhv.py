@@ -1,4 +1,5 @@
 """Secado en caminos (HH y HV por separado), lo que sale del geojson y datos de ruido. Solo lectura."""
+from pathlib import Path
 import json, os, glob
 import numpy as np
 import h5py
@@ -33,7 +34,7 @@ def cargar(n):
     return a_db(z["HHHH"], val), a_db(z["HVHV"], val), z["x"], z["y"], int(z["epsg"]), str(z["archivo"])
 
 
-rd = json.load(open(f"{R}/osm/roads.json", encoding="utf-8"))
+rd = json.loads(Path(f"{R}/osm/roads.json").read_text(encoding="utf-8"))
 ways = [e for e in rd["elements"] if e.get("type") == "way" and len(e.get("geometry", [])) > 1]
 lons = [p["lon"] for w in ways for p in w["geometry"]]; lats = [p["lat"] for w in ways for p in w["geometry"]]
 OUT["bbox_caminos_osm"] = [round(min(lons), 3), round(min(lats), 3), round(max(lons), 3), round(max(lats), 3)]
@@ -50,7 +51,7 @@ for dias, desp, ref in PARES:
     tr = Transformer.from_crs(4326, epsg, always_xy=True).transform
     lt = [LineString([tr(p["lon"], p["lat"]) for p in w["geometry"]]) for w in ways if tipo(w.get("tags")) == "tierra"]
     l3 = {k: LineString([tr(p["lon"], p["lat"]) for p in w["geometry"]]) for w in ways for k, i in CAMINOS3.items() if w["id"] == i}
-    ras = lambda ls, d: rasterize([(l.buffer(d), 1) for l in ls], out_shape=h0.shape, transform=T, dtype="uint8").astype(bool)
+    ras = lambda ls, d, h0=h0, T=T: rasterize([(l.buffer(d), 1) for l in ls], out_shape=h0.shape, transform=T, dtype="uint8").astype(bool)
     ok = np.isfinite(h0) & np.isfinite(h1) & np.isfinite(v0) & np.isfinite(v1)
     eje = ras(lt, 10) & ok
     franja = ras(lt, 30) & ok
@@ -92,7 +93,7 @@ for d in ("2026-10-21", "2026-10-22", "2026-10-23"):
 OUT["3_imerg_celdas_caminos_21a23oct_mm"] = ll
 
 # geojson: qué disparó cada color
-g = json.load(open(f"{R}/nisar/tramos_20261011_161A164.geojson", encoding="utf-8"))
+g = json.loads(Path(f"{R}/nisar/tramos_20261011_161A164.geojson").read_text(encoding="utf-8"))
 km = {}
 reg = {}
 n_agua = n_monte = 0
@@ -138,5 +139,5 @@ ci = np.where((ix >= zc["x"].min()) & (ix <= zc["x"].max()))[0]; ri = np.where((
 a = inc[:, ri.min():ri.max() + 1, ci.min():ci.max() + 1]
 a = a[np.isfinite(a)]
 OUT["4_incidencia_corredor_161A_grados"] = [round(float(a.min()), 1), round(float(a.max()), 1)]
-json.dump(OUT, open(f"{R}/chequeos/salida_secado.json", "w", encoding="utf-8"), indent=1, ensure_ascii=False)
+Path(f"{R}/chequeos/salida_secado.json").write_text(json.dumps(OUT, indent=1, ensure_ascii=False), encoding="utf-8")
 print(json.dumps(OUT, indent=1, ensure_ascii=False))

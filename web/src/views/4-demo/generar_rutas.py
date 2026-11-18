@@ -1,6 +1,6 @@
 # Genera rutas.json para la demo (sección 4): "¿llegás hoy?".
 # Correr (desde la carpeta web):
-#   C:/Users/Usuario/envs/nasa/Scripts/python.exe -I src/views/4-demo/generar_rutas.py
+#   python src/views/4-demo/generar_rutas.py
 #
 # Origen de cada dato:
 # - Caminos y lugares: OpenStreetMap (ODbL), en osm/caminos_osm.json (esta carpeta). Es una descarga de
