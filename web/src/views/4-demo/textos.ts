@@ -2,7 +2,6 @@
 // Para traducir al inglés, alcanza con cambiar este archivo.
 
 const km = new Intl.NumberFormat("es-AR", { minimumFractionDigits: 1, maximumFractionDigits: 1 });
-const entero = new Intl.NumberFormat("es-AR", { maximumFractionDigits: 0 });
 
 /** Cómo se muestra el tag place de OpenStreetMap de cada destino. */
 const TIPOS: Record<string, string> = {
@@ -12,13 +11,17 @@ const TIPOS: Record<string, string> = {
   town: "pueblo",
   isolated_dwelling: "lugar rural (una casa)",
   farm: "lugar rural (un campo)",
+  sin_nombre: "camino rural, sin nombre en el mapa",
 };
+
+/** "2026-10-11" → "11/10/2026". */
+export const fechaCorta = (iso: string) => iso.split("-").reverse().join("/");
 
 export const T4 = {
   tituloSeccion: "La demo: ¿llegás hoy?",
   titulo: "¿Llegás hoy?",
   bajada: "Elegí a dónde vas. BAQUI mira cómo está el camino hoy y te dice si podés salir.",
-  bajadaNota: "En BAQUI el agua la ve el radar NISAR. En esta demo el agua es simulada.",
+  bajadaNota: (fecha: string) => `El estado de cada camino es el que midió el radar NISAR el ${fecha}.`,
 
   buscador: {
     etiqueta: "Recorrido",
@@ -40,32 +43,37 @@ export const T4 = {
   respuesta: {
     titulo: (destino: string) => `Hoy, a ${destino}`,
     transitable: "TRANSITABLE",
+    conBarro: "CON BARRO",
     intransitable: "INTRANSITABLE",
     conDesvio: (n: number, valor: number) => `Por el camino ${n} · ${km.format(valor)} km`,
   },
 
   frases: {
     llegas: "Llegás. Podés salir.",
+    barro: (valor: number) => `Llegás, pero hay barro probable en ${km.format(valor)} km. Andá despacio.`,
     alternativo: "Andá por el camino 2: es más largo, pero llegás.",
     "no-llegas": "No hay otro camino. Hoy no llegás: no salgas.",
   },
 
+  /** Cuánto del camino midió el radar. */
+  medido: (medidos: number, total: number, fecha: string) => `Medición del ${fecha}: el radar midió ${km.format(medidos)} de ${km.format(total)} km. El resto es pavimento o no tiene medición.`,
+
   /** Solo cuando no hay otro camino (respuesta "no salgas"). */
   unSoloCamino: "En el campo, casi siempre hay un solo camino.",
 
-  regla: "Regla: 50 m seguidos de agua nueva sobre el camino y no se pasa. Las lagunas de siempre no cuentan.",
+  regla: "Regla: 50 m seguidos de agua sobre el camino y no se pasa.",
 
   mapa: {
     region: "Mapa satelital del recorrido",
     cargando: "Cargando mapa…",
-    datosPrueba: "Datos de prueba",
-    datosPruebaDetalle: "Agua simulada",
-    leyendaCamino: "Camino (OpenStreetMap)",
-    leyendaAgua: "Agua nueva",
-    leyendaLaguna: "Laguna de siempre",
-    laguna: "Laguna de siempre: no cuenta",
+    datosReales: "Datos reales",
+    datosRealesDetalle: (fecha: string) => `Radar NISAR · ${fecha}`,
+    leyendaRecorrido: "Tu recorrido",
+    leyendaTransitable: "Transitable",
+    leyendaBarro: "Con barro probable",
+    leyendaIntransitable: "Intransitable",
+    leyendaSinDato: "Sin dato",
     aguaSobreCamino: "Agua sobre el camino",
-    charco: (m: number) => `Charco de ${entero.format(m)} m: no alcanza`,
     cartel: (n: number) => `Camino ${n}`,
     cartelKm: (valor: number) => ` · ${km.format(valor)} km`,
     origen: "Gral. San Martín",
@@ -73,7 +81,7 @@ export const T4 = {
     resumen: (destino: string, partes: string[]) =>
       `Recorrido de Gral. San Martín a ${destino}. ${partes.join(" ")}`,
     resumenCamino: (n: number, valor: number, tapado: boolean) =>
-      `Camino ${n}, ${km.format(valor)} km: ${tapado ? "tapado por el agua" : "libre"}.`,
+      `Camino ${n}, ${km.format(valor)} km: ${tapado ? "cortado por el agua" : "sin cortes"}.`,
     resumenSinOtro: "No hay otro camino.",
   },
 

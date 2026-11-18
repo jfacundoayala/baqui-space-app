@@ -5,7 +5,7 @@
 > **Web:** [baqui-nasa.vercel.app](https://baqui-nasa.vercel.app) · **Español:** [README.es.md](README.es.md)
 
 > [!NOTE]
-> **Prototype.** **Real:** the NISAR (NASA-ISRO) radar measurement over 1,201.7 km of unpaved rural roads in the General San Martín corridor, Chaco. **Simulated:** the water in the demo (section 4) and the dispatch console (section 2). The web marks which is which.
+> **Prototype.** **Real:** the NISAR (NASA-ISRO) radar measurement over 1,201.7 km of unpaved rural roads in the General San Martín corridor, Chaco. The demo (section 4) shows the state of each road from the 11 Oct 2026 pass. **Simulated:** the dispatch console (section 2). The web marks which is which.
 
 BAQUI answers a single question: **is the rural road passable after the rain?** It uses NASA's NISAR radar, which sees through clouds, so that nobody has to go to the road to look.
 
@@ -147,7 +147,7 @@ General San Martín corridor (Chaco), ascending orbit 161, frame 164. A pass aft
 | 1 | What BAQUI is | 3D globe with NISAR in its real orbit (Celestrak TLE propagated with `satellite.js`) | [`web/src/views/1-visor/`](web/src/views/1-visor/) |
 | 2 | The problem | Who suffers from the cut road, and the dispatch console (illustrative scene) | [`web/src/views/2-operaciones/`](web/src/views/2-operaciones/) |
 | 3 | Why now: El Niño | Health, logistics, time and money | [`web/src/views/3-impacto/`](web/src/views/3-impacto/) |
-| 4 | The demo: will you get there today? (¿Llegás hoy?) | You pick a destination and BAQUI answers whether you can get there, on real roads with simulated water | [`web/src/views/4-demo/`](web/src/views/4-demo/) |
+| 4 | The demo: will you get there today? (¿Llegás hoy?) | You pick a destination and BAQUI answers whether you can get there, with the state of each road measured by the radar on 11 Oct 2026 | [`web/src/views/4-demo/`](web/src/views/4-demo/) |
 | 5 | How BAQUI knows | Physical hypothesis and the real NISAR measurement | [`web/src/views/5-resultados/`](web/src/views/5-resultados/) |
 
 All the texts of each section are in its `textos.ts` file.
@@ -196,9 +196,10 @@ baqui-space-app/
 
 | Real | Simulated or illustrative |
 |---|---|
-| NISAR data and the measurement in section 5 | The water in the demo (section 4) |
-| Roads and places from OpenStreetMap | The dispatch console (section 2) |
-| The NISAR orbit on the globe | The footer photo: it is from Veracruz, Mexico, not from the measured corridor |
+| NISAR data and the measurement in section 5 | The dispatch console (section 2) |
+| The state of the roads in the demo (section 4): NISAR pass of 11 Oct 2026 | The footer photo: it is from Veracruz, Mexico, not from the measured corridor |
+| Roads and places from OpenStreetMap | |
+| The NISAR orbit on the globe | |
 | Image of the Earth (NASA Blue Marble) | |
 
 ## 10. Limits
@@ -207,7 +208,7 @@ baqui-space-app/
 - **Water under forest is not confirmed.** 38.1% of the road centerline has forest.
 - **The main result is one pair of passes**, backed by two other NISAR orbits, SMAP and IMERG. It still needs validation on the ground.
 - **One open question:** a 14-day pair gives -0.65 dB over the area, but it mixes two versions of the NISAR processor, so it cannot be compared directly.
-- **The state per segment and the day-by-day drying are programmed but not calibrated.** The demo uses simulated water.
+- **The state per segment and the day-by-day drying are programmed but not calibrated.** The demo shows that state, uncalibrated, for a single pass (11 Oct 2026); the impassable segments are water detected under forest, the least verified signal.
 - **Frequency:** NISAR repeats its orbit every 12 days. Over the corridor, 3 different orbits passed in 12 days, so there is new data about every 4 days.
 - **NISAR products are provisional** and are currently published with a delay.
 
@@ -249,7 +250,7 @@ flowchart LR
 
 - Real NISAR measurement over **1,201.7 km** of rural roads in the General San Martín corridor (Chaco): **+1.35 dB**, wet area.
 - The physical hypothesis tested in one comparison (a pass after the rain against a reference pass from the same orbit).
-- Web with the "Will you get there today?" demo on real roads (simulated water), verifiable for free in ASF Vertex.
+- Web with the "Will you get there today?" demo with the state of the roads measured by the radar (11 Oct 2026 pass), verifiable for free in ASF Vertex.
 - Algorithm programmed: state per segment, rainfall since the pass (IMERG) and drying. 56 tests.
 - Audience: State agencies, NGOs and rescue operations.
 
@@ -264,7 +265,6 @@ flowchart LR
   - Validate on the ground with the roads agency, Civil Protection and farmers: photos of the road on the day of the pass.
   - Measure segment by segment (every 100 m) and better separate the road from the field, using both polarizations (HH and HV).
   - Under forest: confirm water with other sources.
-  - Replace the simulated water in the demo with the real measurement.
 - **Harmonize the data and give a confidence level per segment:**
   - A common grid and clock for every source, with quality checks (passes with missing data, processor version changes).
   - Terrain height with NASADEM: compute HAND (height above the nearest drainage) for every segment.
