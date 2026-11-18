@@ -112,5 +112,6 @@ OUT["campo_300a1000m_corredor"] = {"px": int(an.sum()), "dHH": round(float(np.me
                                    "dHH_abierto": round(float(np.median(dH[an & ~monte])), 2),
                                    "dHV_abierto": round(float(np.median(dV[an & ~monte])), 2),
                                    "pct_dHH_baja_3_y_hh1<-18": round(100 * float(((dH <= -3) & (hh1 < -18))[an].mean()), 3)}
+os.makedirs(f"{R}/chequeos", exist_ok=True)
 Path(f"{R}/chequeos/salida_rojos.json").write_text(json.dumps(OUT, indent=1), encoding="utf-8")
 print(json.dumps(OUT, indent=1))
