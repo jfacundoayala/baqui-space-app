@@ -56,7 +56,7 @@ export const T4 = {
   },
 
   /** Cuánto del camino midió el radar. */
-  medido: (medidos: number, total: number) => `El radar midió ${km.format(medidos)} de ${km.format(total)} km. El resto es pavimento o no tiene medición.`,
+  medido: (medidos: number, total: number, fecha: string) => `Medición del ${fecha}: el radar midió ${km.format(medidos)} de ${km.format(total)} km. El resto es pavimento o no tiene medición.`,
 
   /** Solo cuando no hay otro camino (respuesta "no salgas"). */
   unSoloCamino: "En el campo, casi siempre hay un solo camino.",

@@ -19,13 +19,14 @@ OSM = os.path.join(AQUI, "osm", "caminos_osm.json")
 TRAMOS = os.path.join(AQUI, "..", "..", "..", "..", "analisis", "datos", "nisar", "tramos_20261011_161A164.geojson")
 ORIGEN = (-26.537, -59.342)  # centro de General San Martín (Chaco), aprox.
 DESVIO_MAX = 2.0
-CERCA_M = 40  # un tramo del grafo toma el estado del tramo medido del mismo way de OSM si está a menos de esto
+CERCA_M = 40  # un punto del grafo toma el estado del tramo medido del mismo way de OSM si está a menos de esto
+PASO_M = 20  # cada arista del grafo se recorre en pedazos de este largo: una arista larga puede cruzar varios tramos
 ESTADOS = ["transitable", "con barro", "intransitable", "sin dato"]
 
 # Destinos: nodos place=* de OSM. Qué da cada uno con la pasada del 11/10 (el script frena si no da).
 # "desvío" = camino 1 cortado y hay camino 2. "sin salida" = camino 1 cortado y no hay otro.
 DESTINOS = [
-    ("el-fiscal", 7501506407, "transitable"),
+    ("el-fiscal", 7501506407, "con barro"),
     ("siete-arboles", 7501783098, "con barro"),
     ("capitan-solari", 497261005, "desvío"),
     ("campo-sur", None, "sin salida"),
@@ -60,27 +61,35 @@ F = medido["features"]
 LIN = [LineString([fw.transform(*c) for c in f["geometry"]["coordinates"]]) for f in F]
 por_way = collections.defaultdict(list)
 for i, f in enumerate(F): por_way[f["properties"]["way"]].append(i)
-for a, b in G.edges():
-    m = Point((XY[a][0]+XY[b][0])/2, (XY[a][1]+XY[b][1])/2)
-    cand = por_way.get(G[a][b]["way"], [])
-    i = min(cand, key=lambda i: LIN[i].distance(m)) if cand else None
-    ok = i is not None and LIN[i].distance(m) <= CERCA_M
-    G[a][b]["tramo"] = i if ok else None
-    G[a][b]["estado"] = F[i]["properties"]["color"] if ok else None
+# Por arista: metros en cada estado (None = sin medir) y los tramos intransitables que pisa.
+for a, b, d in G.edges(data=True):
+    cand = por_way.get(d["way"], [])
+    d["m"] = collections.Counter(); d["rojos"] = []
+    (xa, ya), (xb, yb) = XY[a], XY[b]
+    n = max(1, math.ceil(d["w"] / PASO_M)) if cand else 1
+    for k in range(n):
+        t = (k + 0.5) / n; m = Point(xa + (xb-xa)*t, ya + (yb-ya)*t)
+        i = min(cand, key=lambda i: LIN[i].distance(m)) if cand else None
+        ok = i is not None and LIN[i].distance(m) <= CERCA_M
+        estado = F[i]["properties"]["color"] if ok else None
+        d["m"][estado] += d["w"] / n
+        if estado == "intransitable" and i not in d["rojos"]: d["rojos"].append(i)
 
 H = G.copy()
-H.remove_edges_from([(a, b) for a, b, d in G.edges(data=True) if d["estado"] == "intransitable"])
+H.remove_edges_from([(a, b) for a, b, d in G.edges(data=True) if d["rojos"]])
 
 def camino(k, p, ancla_frac):
     L = LineString([XY[x] for x in p])
     km = collections.Counter(); cortes = {}
     for a, b in zip(p, p[1:]):
-        d = G[a][b]; km[d["estado"]] += d["w"]
-        if d["estado"] == "intransitable" and d["tramo"] not in cortes:
-            pr = F[d["tramo"]]["properties"]; c = LIN[d["tramo"]].interpolate(0.5, normalized=True)
-            cortes[d["tramo"]] = {"centro": ll(c.x, c.y), "motivo": pr["motivo"], "regla": pr["regla"]}
+        d = G[a][b]; km.update(d["m"])
+        for i in d["rojos"]:
+            if i in cortes: continue
+            pr = F[i]["properties"]; c = LIN[i].interpolate(0.5, normalized=True)
+            cortes[i] = {"centro": ll(c.x, c.y), "motivo": pr["motivo"], "regla": pr["regla"]}
     a = L.interpolate(ancla_frac, normalized=True)
     return {"n": k, "km": round(L.length/1000, 1),
+            "medido_km": round((km["transitable"] + km["con barro"] + km["intransitable"])/1000, 1),
             "radar_km": {"transitable": round(km["transitable"]/1000, 1), "con_barro": round(km["con barro"]/1000, 1),
                          "intransitable": round(km["intransitable"]/1000, 1), "sin_dato": round(km["sin dato"]/1000, 1),
                          "sin_medir": round(km[None]/1000, 1)},

@@ -27,6 +27,8 @@ export type Corte = { centro: LatLon; motivo: string; regla: string };
 export type Camino = {
   n: number;
   km: number;
+  /** Km del camino con estado medido por el radar (sin contar "sin dato" ni lo que no midió). */
+  medido_km: number;
   radar_km: RadarKm;
   cortes: Corte[];
   /** Punto del camino donde va el cartel. */

@@ -211,7 +211,7 @@ export default function Demo() {
               </div>
               {sinOtro && <p className="mt-1.5 text-center text-sm text-ink-2">{T4.unSoloCamino}</p>}
               <p className="mt-1.5 text-center text-xs text-ink-3">
-                {T4.medido(medido.km - medido.radar_km.sin_medir - medido.radar_km.sin_dato, medido.km)}
+                {T4.medido(medido.medido_km, medido.km, FECHA)}
               </p>
             </div>
           </div>
