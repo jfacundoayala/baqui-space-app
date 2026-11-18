@@ -7,7 +7,7 @@
 - Copernicus DEM GLO-30 (ESA, 30 m): la misma altura, como alternativa y para comparar ("dem").
 - SMAP: humedad del suelo (microondas banda L, 9 km, diaria).
 
-Uso: python -m baqui.bajar_capas [opera|imerg|nasadem|dem|smap ...]  (sin nada, baja todo)
+Uso: python -m baqui.descarga.bajar_capas [opera|imerg|nasadem|dem|smap ...]  (sin nada, baja todo)
 """
 import json
 import sys
@@ -17,7 +17,7 @@ import numpy as np
 
 BBOX = (-59.70, -27.55, -58.80, -26.20)  # lon_min, lat_min, lon_max, lat_max
 DESDE, HASTA = "2026-09-25", "2026-11-15"
-RAIZ = Path(__file__).resolve().parent.parent / "datos"
+RAIZ = Path(__file__).resolve().parents[2] / "datos"
 
 
 def opera():

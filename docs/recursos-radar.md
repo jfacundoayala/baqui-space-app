@@ -45,7 +45,7 @@ Esto reemplaza a la lluvia de IMERG (la opción B de antes) con un dato de ondas
 
 ## Cómo cambia la fórmula (propuesta solo radio)
 
-En [MVP-caminos.md](MVP-caminos.md), la lluvia de IMERG (P3 y P7) se cambia por la **humedad de CYGNSS o SMAP**:
+En [mvp-caminos.md](mvp-caminos.md), la lluvia de IMERG (P3 y P7) se cambia por la **humedad de CYGNSS o SMAP**:
 
 ```
 W   = % de agua en la franja (HH muy bajo, o HH muy alto si hay monte)    NISAR

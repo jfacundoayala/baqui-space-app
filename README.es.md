@@ -88,7 +88,7 @@ Paso a paso:
 | OpenStreetMap | Líneas | Se rasterizan: eje (10 m o menos del centro) y franjas de campo para comparar |
 
 
-El detalle está en [`analisis/docs/HIPOTESIS-FISICA.md`](analisis/docs/HIPOTESIS-FISICA.md) y [`analisis/docs/ALGORITMO-BAQUI.md`](analisis/docs/ALGORITMO-BAQUI.md).
+El detalle está en [`docs/hipotesis-fisica.md`](docs/hipotesis-fisica.md) y [`docs/algoritmo.md`](docs/algoritmo.md).
 
 ## 4. Datos de NASA que usamos
 
@@ -181,12 +181,15 @@ baqui-space-app/
 │   ├── src/data/           resultados.json: los números reales con su fuente
 │   └── public/             Imágenes
 ├── analisis/               La ciencia (Python)
-│   ├── baqui/              Descarga, medición, clasificación, lluvia y secado
+│   ├── baqui/              Medición, clasificación, lluvia, secado y rutas
+│   ├── baqui/descarga/     Bajada de datos de la NASA
+│   ├── baqui/graficos/     Imágenes de antes y después
 │   ├── baqui/chequeos/     Controles que generan los números de la web
 │   ├── tests/              56 tests
-│   ├── db/                 Esquema de la base (PostgreSQL + PostGIS)
-│   └── docs/               Hipótesis física, algoritmo y reglas del estado de cada tramo
-└── docs/                   Guion del pitch y del video, y escalabilidad
+│   └── db/                 Esquema de la base (PostgreSQL + PostGIS)
+├── docs/                   Hipótesis física, algoritmo, reglas del estado y escalabilidad
+│   └── pitch/              Guion del pitch y del video
+└── .github/workflows/      Revisión automática de cada cambio
 ```
 
 ## 9. Real y simulado
@@ -220,7 +223,7 @@ baqui-space-app/
 
 Unas 1.500 veces menos de lo que hay que guardar. Con unas 91 pasadas por año sobre el corredor, la base crece unos 105 MB por año. Para 100.000 km de caminos, lo que se consulta (el estado de hoy, una fila por tramo) ocupa unos 75 MB, y el historial va a archivos comprimidos en un almacenamiento barato.
 
-Cuentas, arquitectura y esquema: [`docs/SCALABILITY.md`](docs/SCALABILITY.md) y [`analisis/db/schema.sql`](analisis/db/schema.sql) (PostgreSQL + PostGIS).
+Cuentas, arquitectura y esquema: [`docs/escalabilidad.md`](docs/escalabilidad.md) y [`analisis/db/schema.sql`](analisis/db/schema.sql) (PostgreSQL + PostGIS).
 
 Arquitectura propuesta:
 

@@ -3,7 +3,7 @@
 -- Idea: NASA (y CONAE) guardan las imágenes; BAQUI guarda solo la respuesta por tramo.
 -- Tres tablas: tramos (los caminos cortados cada 100 m), pasadas (cada archivo de radar)
 -- y lecturas (lo que midió cada pasada en cada tramo). La web consulta solo "estado_hoy".
--- Explicación y cuentas de tamaño: docs/SCALABILITY.md.
+-- Explicación y cuentas de tamaño: docs/escalabilidad.md.
 
 create extension if not exists postgis;
 

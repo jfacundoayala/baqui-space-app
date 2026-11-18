@@ -1,7 +1,7 @@
 # Baqui: clasificación, auditoría y procesamiento
 
 14/11/2026. Este documento junta tres cosas:
-- El algoritmo del equipo, [ALGORITMO-BAQUI.md](ALGORITMO-BAQUI.md), que es la base.
+- El algoritmo del equipo, [algoritmo.md](algoritmo.md), que es la base.
 - Las reglas de seguridad para que no mienta.
 - La auditoría que permite **garantizar** un porcentaje de acierto.
 

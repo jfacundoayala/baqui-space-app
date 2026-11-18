@@ -1,6 +1,6 @@
 """Semáforo de Baqui (versión 2).
 
-Base: docs/ALGORITMO-BAQUI.md (5 variables, eslabón más débil, umbral de lluvia
+Base: docs/algoritmo.md (5 variables, eslabón más débil, umbral de lluvia
 por HAND). Se le suman las reglas de seguridad de docs/clasificacion-semaforo.md
 (calidad del dato, prudencia cerca de los cortes, contradicciones, asfalto).
 Orden: sin dato -> rojo -> gris -> amarillo -> verde. La primera que se cumple decide.
