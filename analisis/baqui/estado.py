@@ -11,6 +11,7 @@ Idea: un índice de barro (0 a 100) con memoria.
 Todos los números son de arranque: `media_vida` se calibra con las pasadas de NISAR
 posteriores a la lluvia del 9/10/2026 (ver docs/clasificacion-semaforo.md).
 """
+import math
 from dataclasses import dataclass, field
 
 ROJO, AMARILLO, VERDE, SIN_DATO = "intransitable", "con barro", "transitable", "sin dato"
@@ -53,10 +54,19 @@ def desde_radar(dhh_db, agua_seguida_m=0.0, p: Parametros = Parametros()):
     """Índice de barro medido por el radar en el día de la pasada."""
     if agua_seguida_m >= 50:
         return 100.0
+    if not _es_numero(dhh_db):
+        return float("nan")
     return max(0.0, min(100.0, 100 * dhh_db / p.dhh_lleno))
 
 
+def _es_numero(x):
+    return isinstance(x, (int, float)) and math.isfinite(x)
+
+
 def color(indice, p: Parametros = Parametros()):
+    # Un índice vacío o roto (None, NaN, inf) nunca puede dar "transitable".
+    if not _es_numero(indice):
+        return SIN_DATO
     if indice >= p.corte_rojo * (1 - p.margen):
         return ROJO
     if indice >= p.corte_amarillo * (1 - p.margen):
@@ -107,7 +117,7 @@ def evolucionar(fechas, lluvia_mm, pasadas, hand_m=None, p: Parametros = Paramet
                 indice = indice * p.secado_diario(hand_m)
                 motivo = "día seco: se seca"
         c = SIN_DATO if desde > p.max_dias_radar else color(indice, p)
-        s.dias.append(Dia(f, round(indice, 1), c, desde, motivo))
+        s.dias.append(Dia(f, round(indice, 1) if _es_numero(indice) else float("nan"), c, desde, motivo))
     return s
 
 
