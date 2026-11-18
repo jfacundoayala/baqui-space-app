@@ -1,0 +1,9 @@
+# Reglas que atrapan errores reales; el estilo de los scripts se deja como está.
+line-length = 200
+
+[lint]
+select = ["E9", "F", "B", "SIM115"]
+ignore = [
+    "B008",  # Umbrales()/Parametros()/Cortes() como valor por defecto: nunca se modifican
+    "B905",  # zip() sin strict
+]

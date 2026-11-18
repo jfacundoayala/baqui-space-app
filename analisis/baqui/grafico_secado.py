@@ -1,5 +1,6 @@
+from pathlib import Path
 import json, matplotlib; matplotlib.use("Agg"); import matplotlib.pyplot as plt
-f=json.load(open("datos/nisar/secado.json"))
+f=json.loads(Path("datos/nisar/secado.json").read_text(encoding="utf-8"))
 lluvia={0:59,1:1,2:3,3:1,12:2,13:2,14:3}
 fig,ax=plt.subplots(figsize=(9,4.6)); ax2=ax.twinx()
 ax2.bar(list(lluvia),list(lluvia.values()),color="#9ecae1",width=0.6,label="lluvia (mm, NASA POWER)"); ax2.set_ylabel("lluvia del día (mm)"); ax2.set_ylim(0,120)

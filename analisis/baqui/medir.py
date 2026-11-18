@@ -22,7 +22,8 @@ Por tramo se mira una franja de `franja_m` a cada lado del eje. Los metros segui
 de `paso_m` a lo largo del camino: una casilla cuenta si tiene al menos un píxel de la clase.
 El HAND queda para el paso siguiente: mientras tanto el clasificador usa el umbral fijo de 25 mm.
 """
-import argparse, json, os
+from pathlib import Path
+import argparse, json
 from dataclasses import dataclass, asdict
 from datetime import date, timedelta
 
@@ -170,7 +171,7 @@ def _partes(archivo):
 
 
 def caminos_osm(ruta="datos/osm/roads.json"):
-    rd = json.load(open(ruta, encoding="utf-8"))
+    rd = json.loads(Path(ruta).read_text(encoding="utf-8"))
     return [e for e in rd["elements"] if e.get("type") == "way" and len(e.get("geometry", [])) > 1]
 
 
@@ -219,8 +220,8 @@ def main(argv=None):
             "tramo_m": args.tramo, "cortes": asdict(Cortes()), **{k: round(v, 2) for k, v in info.items()},
             "lluvia": f"IMERG Late diario, del {pasada + timedelta(days=1):%d/%m} al {hoy:%d/%m}" if lluvia else "sin lluvia: hoy = día de la pasada",
             "pendiente": "HAND todavía no se suma (umbral fijo de 25 mm)"}
-    json.dump({"type": "FeatureCollection", "baqui": meta, "features": feats},
-              open(salida, "w", encoding="utf-8"), ensure_ascii=False)
+    Path(salida).write_text(json.dumps({"type": "FeatureCollection", "baqui": meta, "features": feats},
+                                       ensure_ascii=False), encoding="utf-8")
     print(json.dumps({k: meta[k] for k in meta if k not in ("cortes",)}, ensure_ascii=False, indent=1))
     print(f"{len(feats)} tramos -> {salida}")
     for k, v in sorted(colores.items(), key=lambda kv: -kv[1]):

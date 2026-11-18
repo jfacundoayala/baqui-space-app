@@ -1,4 +1,5 @@
-import json, os, numpy as np
+from pathlib import Path
+import json, numpy as np
 import matplotlib; matplotlib.use("Agg"); import matplotlib.pyplot as plt
 from scipy.ndimage import median_filter
 from pyproj import Transformer
@@ -15,7 +16,7 @@ print("agua antes %.2f %% despues %.2f %% | agua nueva %.2f %%"%(100*np.nanmean(
 d=h1-h0; print("dHH mediana %.2f dB; %% area con dHH>1 dB: %.0f"%(np.nanmedian(d),100*np.nanmean(d>1)))
 x,y=a["x"],a["y"]; T=from_origin(x[0]-10,y[0]+10,20,20) if y[0]>y[-1] else None
 epsg=int(a["epsg"]); tr=Transformer.from_crs(4326,epsg,always_xy=True)
-rd=json.load(open(os.environ["TMP"]+"/s1/roads.json",encoding="utf-8"))
+rd=json.loads(Path("datos/osm/roads.json").read_text(encoding="utf-8"))
 geo={e["id"]:e["geometry"] for e in rd["elements"] if e.get("type")=="way" and "geometry" in e}
 for i in (746343006,118260612,1084701978):
     ln=LineString([tr.transform(p["lon"],p["lat"]) for p in geo[i]])

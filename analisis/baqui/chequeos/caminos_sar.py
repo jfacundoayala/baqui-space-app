@@ -1,5 +1,6 @@
 """Mide qué se ve y qué no en los caminos (corredor, NISAR 161A164 29/09 vs 11/10). Solo lectura."""
-import json, glob, os, sys
+from pathlib import Path
+import json, glob, os
 import numpy as np
 from scipy.ndimage import median_filter, uniform_filter
 import rasterio
@@ -54,7 +55,7 @@ shape = hh0.shape
 print("grilla", shape, "validos", ok.sum())
 
 # --- caminos rasterizados por distancia al eje
-rd = json.load(open(f"{R}/osm/roads.json", encoding="utf-8"))
+rd = json.loads(Path(f"{R}/osm/roads.json").read_text(encoding="utf-8"))
 ways = [e for e in rd["elements"] if e.get("type") == "way" and len(e.get("geometry", [])) > 1]
 tr = Transformer.from_crs(4326, epsg, always_xy=True).transform
 lineas = {"tierra": [], "ripio": [], "asfalto": []}
@@ -221,5 +222,5 @@ OUT["4_monte_tapa"] = {"pct_eje_tierra_con_monte": round(100 * float(monte[eje["
                        "pct_franja_tierra_con_monte": round(100 * float(monte[franja["tierra"]].mean()), 1)}
 OUT["4_agua_cerca_ruido_hh_seco_lagunas_p50_p05"] = [round(float(np.nanmedian(hh0[siempre])), 2),
                                                      round(float(np.nanpercentile(hh0[siempre], 5)), 2)]
-json.dump(OUT, open(f"{R}/chequeos/salida_corredor.json", "w", encoding="utf-8"), indent=1, ensure_ascii=False)
+Path(f"{R}/chequeos/salida_corredor.json").write_text(json.dumps(OUT, indent=1, ensure_ascii=False), encoding="utf-8")
 print(json.dumps(OUT, indent=1, ensure_ascii=False))

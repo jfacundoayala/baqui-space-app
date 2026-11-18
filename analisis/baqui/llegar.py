@@ -25,7 +25,7 @@ def mejor_recorrido(G: nx.Graph, origen, destino):
     if origen not in G or destino not in G:
         raise ValueError("el origen o el destino no están en el mapa de caminos")
     for nivel in range(4):
-        H = nx.subgraph_view(G, filter_edge=lambda u, v, *k: _gravedad(_dato(G, u, v, k)["color"]) <= nivel)
+        H = nx.subgraph_view(G, filter_edge=lambda u, v, *k, nivel=nivel: _gravedad(_dato(G, u, v, k)["color"]) <= nivel)
         try:
             camino = nx.shortest_path(H, origen, destino, weight="largo_m")
         except nx.NetworkXNoPath:

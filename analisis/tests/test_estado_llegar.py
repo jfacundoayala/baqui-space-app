@@ -1,5 +1,5 @@
 import networkx as nx
-from baqui.estado import color, dias_hasta_pasar, evolucionar, desde_radar, manana_sin_lluvia, Parametros, ROJO, AMARILLO, VERDE, SIN_DATO
+from baqui.estado import color, dias_hasta_pasar, evolucionar, desde_radar, manana_sin_lluvia, ROJO, AMARILLO, VERDE, SIN_DATO
 from baqui.llegar import mejor_recorrido
 
 F = [f"{d}/10" for d in range(11, 21)]
