@@ -6,6 +6,7 @@
 // Con menos movimiento queda un cuadro quieto, sin lluvia, rayos ni temblor.
 
 import { useEffect, useRef } from "react";
+import { crearRegulador } from "@/components/regulador";
 
 type Capa = { img: HTMLCanvasElement; velocidad: number; alto: number; alfa: number };
 type Gota = { x: number; y: number; largo: number; vel: number; z: number };
@@ -91,11 +92,14 @@ function crearCapa(
   techo: number,
   tamano: number,
   cortinas: number,
+  detalle: number,
 ): HTMLCanvasElement {
+  // `detalle` achica la capa (son manchas suaves que después se estiran): menos píxeles para pintar.
   const c = document.createElement("canvas");
-  c.width = TILE_W;
-  c.height = TILE_H;
+  c.width = TILE_W * detalle;
+  c.height = TILE_H * detalle;
   const ctx = c.getContext("2d")!;
+  ctx.scale(detalle, detalle);
   const r = azar(semilla);
   const [cr, cg, cb] = color;
 
@@ -134,6 +138,7 @@ function crearCapa(
     const rad = (50 + r() * 120) * tamano;
     const a = alfa * (0.5 + r() * 0.5);
     for (const dx of [-TILE_W, 0, TILE_W]) {
+      if (x + dx + rad < 0 || x + dx - rad > TILE_W) continue; // la copia cae fuera de la capa
       const g = ctx.createRadialGradient(x + dx, y, 0, x + dx, y, rad);
       g.addColorStop(0, `rgba(${cr},${cg},${cb},${a})`);
       g.addColorStop(0.55, `rgba(${cr},${cg},${cb},${a * 0.45})`);
@@ -165,16 +170,34 @@ export default function Tormenta({ activo, menos }: { activo: boolean; menos: bo
     const ctx = canvas.getContext("2d");
     if (!ctx) return;
 
+    // En el celular las nubes se pintan a la mitad de tamaño: se ven igual y la página arranca antes.
+    const detalle = window.innerWidth < 1024 ? 0.5 : 1;
     const capas: Capa[] = [
-      { img: crearCapa(11, 70, [30, 41, 64], 0.7, 0.72, 1.3, 0), velocidad: 5, alto: 0.95, alfa: 1 },
-      { img: crearCapa(23, 55, [52, 66, 94], 0.5, 0.62, 1.0, 5), velocidad: 11, alto: 1, alfa: 1 },
-      { img: crearCapa(37, 34, [78, 92, 122], 0.32, 0.5, 1.15, 3), velocidad: 19, alto: 0.85, alfa: 1 },
+      { img: crearCapa(11, 70, [30, 41, 64], 0.7, 0.72, 1.3, 0, detalle), velocidad: 5, alto: 0.95, alfa: 1 },
+      { img: crearCapa(23, 55, [52, 66, 94], 0.5, 0.62, 1.0, 5, detalle), velocidad: 11, alto: 1, alfa: 1 },
+      { img: crearCapa(37, 34, [78, 92, 122], 0.32, 0.5, 1.15, 3, detalle), velocidad: 19, alto: 0.85, alfa: 1 },
     ];
 
     let W = 1;
     let H = 1;
     let dpr = 1;
     let gotas: Gota[] = [];
+    let raf = 0;
+    // Si el equipo no llega a dibujar fluido: primero se dibuja a media resolución y, si sigue lento,
+    // la tormenta queda quieta (el mismo cuadro que con "menos movimiento").
+    let escala = 1;
+    let lento = false;
+    const regulador = crearRegulador((nivel) => {
+      if (nivel === 1) {
+        escala = 0.5;
+        ajustar();
+      } else {
+        lento = true;
+        cancelAnimationFrame(raf);
+        raf = 0;
+        dibujar(performance.now(), false);
+      }
+    });
 
     function nuevaGota(arriba: boolean): Gota {
       const z = 0.45 + Math.random() * 0.55;
@@ -189,7 +212,7 @@ export default function Tormenta({ activo, menos }: { activo: boolean; menos: bo
 
     function ajustar() {
       // En el celular la lluvia se dibuja a densidad 1: se ve igual y pesa menos.
-      dpr = Math.min(window.devicePixelRatio || 1, window.innerWidth < 1024 ? 1 : 1.5);
+      dpr = Math.min(window.devicePixelRatio || 1, window.innerWidth < 1024 ? 1 : 1.5) * escala;
       W = Math.max(1, canvas!.clientWidth);
       H = Math.max(1, canvas!.clientHeight);
       canvas!.width = Math.round(W * dpr);
@@ -327,10 +350,11 @@ export default function Tormenta({ activo, menos }: { activo: boolean; menos: bo
       }
     }
 
-    let raf = 0;
     let previo = 0;
     function cuadro(ahora: number) {
       raf = requestAnimationFrame(cuadro);
+      regulador.medir(previo ? ahora - previo : 0);
+      if (lento) return;
       const dt = previo ? Math.min(0.05, (ahora - previo) / 1000) : 0;
       previo = ahora;
       corrida += dt;
@@ -355,8 +379,9 @@ export default function Tormenta({ activo, menos }: { activo: boolean; menos: bo
 
     control.current = {
       arrancar() {
-        if (raf) return;
+        if (raf || lento) return;
         previo = 0;
+        regulador.reiniciar();
         // Si estuvo en pausa, el próximo rayo espera de nuevo (nunca dos seguidos al volver).
         proximoRayo = Math.max(proximoRayo, performance.now() + 1500);
         proximoLejano = Infinity;
@@ -374,7 +399,7 @@ export default function Tormenta({ activo, menos }: { activo: boolean; menos: bo
 
     const ro = new ResizeObserver(() => {
       ajustar();
-      if (!raf) dibujar(performance.now(), !estado.current.menos);
+      if (!raf) dibujar(performance.now(), !estado.current.menos && !lento);
     });
     ro.observe(canvas);
     ajustar();

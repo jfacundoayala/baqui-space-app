@@ -5,6 +5,7 @@
 // la órbita y NISAR giran juntos y las etiquetas siguen en su lugar.
 
 import { useEffect, useRef, useState } from "react";
+import { crearRegulador } from "@/components/regulador";
 import * as THREE from "three";
 import { ACELERACION, PERIODO_MIN, giroTierra, latLonAEscena, posicionNisar, type Vec3 } from "./orbita";
 import { textos } from "./textos";
@@ -769,8 +770,22 @@ export default function Globo({ activo, menos }: { activo: boolean; menos: boole
     let previo = 0;
     /** true mientras el navegador tiene el contexto WebGL perdido. */
     let sinContexto = false;
+    // Si el equipo no llega a dibujar fluido: primero baja la resolución y, si sigue lento, dibuja
+    // unos 15 cuadros por segundo para dejar libre el resto de la página.
+    let saltear = false;
+    let ultimoDibujo = 0;
+    const regulador = crearRegulador((nivel) => {
+      if (nivel === 1) {
+        renderer.setPixelRatio(Math.min(dpr, 1) * 0.75);
+        ajustar();
+      } else saltear = true;
+    });
+
     function cuadro(ahora: number) {
       raf = requestAnimationFrame(cuadro);
+      if (saltear && ahora - ultimoDibujo < 66) return;
+      ultimoDibujo = ahora;
+      regulador.medir(previo ? ahora - previo : 0);
       const dt = previo ? Math.min(0.05, (ahora - previo) / 1000) : 0;
       previo = ahora;
 
@@ -813,6 +828,7 @@ export default function Globo({ activo, menos }: { activo: boolean; menos: boole
       arrancar() {
         if (raf || sinContexto) return;
         previo = 0;
+        regulador.reiniciar();
         raf = requestAnimationFrame(cuadro);
       },
       frenar() {
