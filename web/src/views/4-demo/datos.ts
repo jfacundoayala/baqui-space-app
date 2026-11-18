@@ -1,37 +1,37 @@
-// Datos de la demo, tipados. Vienen de rutas.json (se arma con Python: generar_rutas.py en esta carpeta).
+// Datos de la demo, tipados. Vienen de rutas.json y estado_radar.json (se arman con Python: generar_estado_radar.py).
 //
 // Origen de cada dato:
-// - Caminos y lugares: OpenStreetMap (ODbL), osm/caminos_osm.json: descarga Overpass con todas las clases de
-//   camino para autos, en un recuadro más grande que la zona de la demo (la consulta y la fecha están adentro).
+// - Estado de los caminos: REAL, medido por el radar NISAR. Sale de analisis/baqui/medir.py: tramos de 1 km de los
+//   caminos rurales de OSM, cada uno con su estado. La pasada y su fecha están en `radar`.
+// - Caminos y lugares: OpenStreetMap (ODbL), osm/caminos_osm.json.
 //   Camino 1 = el más corto por la red.
-//   Camino 2 = el más corto que no pisa el agua. Solo existe si no es más del doble de largo que el camino 1.
-// - Destinos: nodos place=* de OpenStreetMap (los tres son place=hamlet: parajes).
-// - Tramo único: tramo del camino 1 hecho de "puentes" del grafo de OSM (si se corta, no hay otra forma de llegar).
-//   Alcance: "un solo camino" quiere decir "un solo camino cargado en OpenStreetMap".
-// - Agua: SIMULADA para la demo, una sola capa "de hoy" para todos los destinos. No es una medición del radar.
-//   Cada mancha toca solo caminos de tierra según OSM (surface=unpaved); el generador frena si no.
+//   Camino 2 = el más corto que no pisa tramos intransitables. Solo existe si el camino 1 está cortado y el desvío
+//   no es más del doble de largo.
+// - Lo que el radar no midió (rutas pavimentadas, calles, caminos fuera de la zona) figura como "sin medir".
 import rutas from "./rutas.json";
-import type { LatLon, Poligono } from "./logica";
+import type { LatLon } from "./logica";
 
-export type TipoAgua = "agua_nueva" | "charco" | "laguna_siempre";
-
-export type Agua = {
-  id: string;
-  tipo: TipoAgua;
-  simulado: boolean;
-  centro: LatLon;
-  /** Ways de OSM que toca la mancha, con su surface (para comprobar que son de tierra). */
-  caminos_osm_tocados: { way: number; surface: string | null }[];
-  coords: Poligono;
+/** Kilómetros del camino por estado del radar. */
+export type RadarKm = {
+  transitable: number;
+  con_barro: number;
+  intransitable: number;
+  sin_dato: number;
+  /** El radar no midió ese camino (pavimento, calles o fuera de la zona). */
+  sin_medir: number;
 };
+
+/** Tramo intransitable sobre el camino. */
+export type Corte = { centro: LatLon; motivo: string; regla: string };
 
 export type Camino = {
   n: number;
   km: number;
-  km_por_superficie_osm: { tierra: number; pavimento: number; sin_dato: number };
+  radar_km: RadarKm;
+  cortes: Corte[];
   /** Punto del camino donde va el cartel. */
   ancla: LatLon;
-  /** Solo en destinos con un solo camino: de qué lado del ancla va el cartel (el que no tapa el camino). */
+  /** De qué lado del ancla va el cartel cuando hay un solo camino. */
   cartel_lado?: "right" | "left";
   coords: LatLon[];
 };
@@ -45,43 +45,32 @@ export type Alternativa = {
 
 export type Destino = {
   id: string;
-  /** Nombre tal cual está en OpenStreetMap. */
+  /** Nombre tal cual está en OpenStreetMap. Si place_osm es "sin_nombre", el lugar no tiene nombre en el mapa. */
   nombre: string;
-  /** Tag place de OSM (hamlet, village...). El texto que se muestra está en textos.ts. */
+  /** Tag place de OSM (hamlet, village...) o "sin_nombre". El texto que se muestra está en textos.ts. */
   place_osm: string;
   osm_nodo: number;
   lat: number;
   lon: number;
-  /** [desde, hasta] en km del tramo del camino 1 por el que se llega de una sola forma. */
-  tramo_unico_km: [number, number];
-  /** true si ese tramo único mide 500 m o más: se llega por un solo camino. */
-  un_solo_camino: boolean;
   alternativa: Alternativa;
   /** Camino 1 siempre; camino 2 solo si hay alternativa real. */
   caminos: Camino[];
 };
 
 export type Datos = {
-  /** Destino con el que abre la demo: el TRANSITABLE (primero de la lista). */
+  /** Pasada del radar de la que sale el estado. fecha = AAAA-MM-DD. */
+  radar: { fecha: string; pasada: string; referencia: string };
+  /** Destino con el que abre la demo (primero de la lista). */
   destino_inicial: string;
-  superficies_tierra: string[];
   origen: { lat: number; lon: number; osm_nodo: number };
   destinos: Destino[];
-  /** Agua de hoy (simulada), la misma para todos los destinos. */
-  agua: Agua[];
+};
+
+/** Capa del mapa: todos los tramos medidos, agrupados por estado. */
+export type EstadoRadar = {
+  tramos: Record<"transitable" | "con barro" | "intransitable" | "sin dato", number>;
+  lineas: Record<"transitable" | "con barro" | "intransitable" | "sin dato", LatLon[][]>;
 };
 
 export const DATOS = rutas as unknown as Datos;
-
-/** Destino con el que abre la demo: Colonia Villa Jardín, TRANSITABLE ("Llegás. Podés salir."). */
 export const DESTINO_INICIAL = DATOS.destino_inicial;
-
-/** Agua nueva de hoy (incluye charcos chicos que no alcanzan a cortar). */
-export function aguaDeHoy(): Agua[] {
-  return DATOS.agua.filter((a) => a.tipo !== "laguna_siempre");
-}
-
-/** Lagunas de siempre: están siempre y no cuentan. */
-export function lagunasDeSiempre(): Agua[] {
-  return DATOS.agua.filter((a) => a.tipo === "laguna_siempre");
-}

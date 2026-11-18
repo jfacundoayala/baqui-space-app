@@ -72,7 +72,7 @@ export const textos = {
   real: "Real:",
   realTexto: "radar NISAR, caminos de OpenStreetMap y los resultados de esta sección.",
   simulado: "Simulado:",
-  simuladoTexto: "el agua de la demo (sección 4) y la consola de la sección 2 (escena ilustrativa).",
+  simuladoTexto: "la consola de la sección 2 (escena ilustrativa).",
   hecho: "Hecho para NASA Space Apps Challenge 2026 · General San Martín, Chaco",
   separador: "·",
   ia: "Se usó IA para programar y redactar; está declarado en la entrega.",

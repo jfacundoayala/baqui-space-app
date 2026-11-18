@@ -5,7 +5,7 @@
 > **Web:** [baqui-nasa.vercel.app](https://baqui-nasa.vercel.app) · **English:** [README.md](README.md)
 
 > [!NOTE]
-> **Prototipo.** **Real:** la medición del radar NISAR (NASA-ISRO) sobre 1.201,7 km de caminos rurales sin pavimento del corredor de General San Martín, Chaco. **Simulado:** el agua de la demo (sección 4) y la consola de despacho (sección 2). La web marca qué es cada cosa.
+> **Prototipo.** **Real:** la medición del radar NISAR (NASA-ISRO) sobre 1.201,7 km de caminos rurales sin pavimento del corredor de General San Martín, Chaco. La demo (sección 4) muestra el estado de cada camino según la pasada del 11/10/2026. **Simulado:** la consola de despacho (sección 2). La web marca qué es cada cosa.
 
 BAQUI responde una sola pregunta: **¿el camino rural está transitable después de la lluvia?** Usa el radar NISAR de NASA, que ve a través de las nubes, para que nadie tenga que ir hasta el camino a mirar.
 
@@ -147,7 +147,7 @@ Corredor de General San Martín (Chaco), órbita 161 ascendente, frame 164. Una 
 | 1 | Qué es BAQUI | Globo 3D con NISAR en su órbita real (TLE de Celestrak propagado con `satellite.js`) | [`web/src/views/1-visor/`](web/src/views/1-visor/) |
 | 2 | El problema | Quién sufre el camino cortado y la consola de despacho (escena ilustrativa) | [`web/src/views/2-operaciones/`](web/src/views/2-operaciones/) |
 | 3 | Por qué ahora: El Niño | Salud, logística, tiempo y dinero | [`web/src/views/3-impacto/`](web/src/views/3-impacto/) |
-| 4 | La demo: ¿llegás hoy? | Elegís un destino y BAQUI responde si llegás, sobre caminos reales con agua simulada | [`web/src/views/4-demo/`](web/src/views/4-demo/) |
+| 4 | La demo: ¿llegás hoy? | Elegís un destino y BAQUI responde si llegás, con el estado de cada camino medido por el radar el 11/10/2026 | [`web/src/views/4-demo/`](web/src/views/4-demo/) |
 | 5 | Cómo lo sabe BAQUI | Hipótesis física y la medición real de NISAR | [`web/src/views/5-resultados/`](web/src/views/5-resultados/) |
 
 Todos los textos de cada sección están en su archivo `textos.ts`.
@@ -196,9 +196,10 @@ baqui-space-app/
 
 | Real | Simulado o ilustrativo |
 |---|---|
-| Datos de NISAR y la medición de la sección 5 | El agua de la demo (sección 4) |
-| Caminos y lugares de OpenStreetMap | La consola de despacho (sección 2) |
-| La órbita de NISAR en el globo | La foto del pie de página: es de Veracruz, México, no del corredor medido |
+| Datos de NISAR y la medición de la sección 5 | La consola de despacho (sección 2) |
+| El estado de los caminos de la demo (sección 4): pasada de NISAR del 11/10/2026 | La foto del pie de página: es de Veracruz, México, no del corredor medido |
+| Caminos y lugares de OpenStreetMap | |
+| La órbita de NISAR en el globo | |
 | Imagen de la Tierra (NASA Blue Marble) | |
 
 ## 10. Límites
@@ -207,7 +208,7 @@ baqui-space-app/
 - **Bajo el monte no se confirma agua.** El 38,1 % del eje de los caminos tiene monte.
 - **El resultado principal es un par de pasadas**, respaldado por otras dos órbitas de NISAR, SMAP e IMERG. Falta validarlo en el terreno.
 - **Una duda abierta:** un par de 14 días da -0,65 dB en la zona, pero mezcla dos versiones del procesador de NISAR, así que no se puede comparar directo.
-- **El estado por tramo y el secado día a día están programados pero no calibrados.** La demo usa agua simulada.
+- **El estado por tramo y el secado día a día están programados pero no calibrados.** La demo muestra ese estado, sin calibrar, para una sola pasada (11/10/2026); los tramos intransitables son agua detectada bajo el monte, la señal menos comprobada.
 - **Frecuencia:** NISAR repite órbita cada 12 días. Sobre el corredor pasaron 3 órbitas distintas en 12 días, así que hay un dato nuevo cada unos 4 días.
 - **Los productos de NISAR son provisionales** y hoy se publican con atraso.
 
@@ -249,7 +250,7 @@ flowchart LR
 
 - Medición real de NISAR sobre **1.201,7 km** de caminos rurales del corredor de General San Martín (Chaco): **+1,35 dB**, zona mojada.
 - La hipótesis física probada en una comparación (pasada después de la lluvia contra una de referencia de la misma órbita).
-- Web con la demo "¿Llegás hoy?" sobre caminos reales (agua simulada), verificable gratis en ASF Vertex.
+- Web con la demo "¿Llegás hoy?" con el estado de los caminos medido por el radar (pasada del 11/10/2026), verificable gratis en ASF Vertex.
 - Algoritmo programado: estado por tramo, lluvia desde la pasada (IMERG) y secado. 56 tests.
 - Público: organismos del Estado, ONG y operaciones de rescate.
 
@@ -264,7 +265,6 @@ flowchart LR
   - Validar en el terreno con Vialidad, Protección Civil y productores: fotos del camino el mismo día de la pasada.
   - Medir tramo por tramo (cada 100 m) y separar mejor el camino del campo, usando las dos polarizaciones (HH y HV).
   - Bajo el monte: confirmar el agua con otras fuentes.
-  - Reemplazar el agua simulada de la demo por la medición real.
 - **Armonizar los datos y dar un nivel de confianza por tramo:**
   - Una grilla y un reloj comunes para todas las fuentes, con controles de calidad (pasadas con dato faltante, cambio de versión del procesador).
   - Altura del terreno con NASADEM: calcular el HAND (altura sobre el drenaje más cercano) de cada tramo.

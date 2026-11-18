@@ -1,7 +1,7 @@
 "use client";
 // La demo: una consulta de hoy. [Gral. San Martín] → [¿Hacia dónde?] → respuesta.
 // La consulta corre sola al elegir destino (abre con el destino TRANSITABLE); "Consultar" la vuelve a correr (el agua aparece de nuevo).
-import { Check, FlaskConical, Radar, X } from "lucide-react";
+import { Check, Radar, TriangleAlert, X } from "lucide-react";
 import { useEffect, useMemo, useRef, useState, type ComponentProps, type ComponentType, type RefObject } from "react";
 import Fuente from "@/components/Fuente";
 import Reveal from "@/components/Reveal";
@@ -9,16 +9,14 @@ import Encabezado from "@/components/Encabezado";
 import { useMenosMovimiento } from "@/components/hooks";
 import Buscador from "./Buscador";
 import type MapaDemoTipo from "./MapaDemo";
-import { DATOS, DESTINO_INICIAL, aguaDeHoy, lagunasDeSiempre } from "./datos";
-import { caminoTapado, tramoTapadoMasLargo, tramoTapadoMaxM, veredicto, type LatLon } from "./logica";
-import { T4 } from "./textos";
+import { DATOS, DESTINO_INICIAL, type EstadoRadar } from "./datos";
+import { veredicto } from "./logica";
+import { T4, fechaCorta } from "./textos";
 import s from "./demo.module.css";
 
 
-const AGUA = aguaDeHoy();
-const LAGUNAS = lagunasDeSiempre();
-const POL_AGUA = AGUA.map((a) => a.coords);
-const POL_LAGUNAS = LAGUNAS.map((a) => a.coords);
+const FECHA = fechaCorta(DATOS.radar.fecha);
+
 /** Agua sobre el camino más corta que esto (en metros) casi no se ve al zoom del recorrido: lleva aro y rótulo. */
 const AGUA_CORTA_M = 400;
 
@@ -29,6 +27,21 @@ const AGUA_CORTA_M = 400;
  * a agregar al mapa borrado ("appendChild" en TileLayer, "Map container is being reused"). Así no hay componente
  * perezoso ni Suspense: el componente es el mismo de siempre y la recarga en caliente lo actualiza en su lugar.
  */
+/** La capa con el estado de todos los caminos (100 kB) se baja junto con el mapa, no con la página. */
+function useRadar() {
+  const [radar, setRadar] = useState<EstadoRadar | null>(null);
+  useEffect(() => {
+    let vivo = true;
+    import("./estado_radar.json").then((m) => {
+      if (vivo) setRadar(m.default as unknown as EstadoRadar);
+    });
+    return () => {
+      vivo = false;
+    };
+  }, []);
+  return radar;
+}
+
 function useMapa() {
   const [Mapa, setMapa] = useState<ComponentType<ComponentProps<typeof MapaDemoTipo>> | null>(null);
   useEffect(() => {
@@ -67,59 +80,47 @@ function useVisibilidad(ref: RefObject<Element | null>) {
   return { visible, vista };
 }
 
-/** En el celular la laguna se nombra en el mapa (rótulo), así la leyenda entra en una línea. */
-function Leyenda({ className = "", sinLaguna = false }: { className?: string; sinLaguna?: boolean }) {
+const LEYENDA = [
+  ["bg-[#e8edf5] ring-2 ring-[#05080f]", T4.mapa.leyendaRecorrido],
+  ["bg-[#34d399]", T4.mapa.leyendaTransitable],
+  ["bg-[#fbbf24]", T4.mapa.leyendaBarro],
+  ["bg-[#f87171]", T4.mapa.leyendaIntransitable],
+  ["bg-[#94a3b8]", T4.mapa.leyendaSinDato],
+] as const;
+
+function Leyenda({ className = "" }: { className?: string }) {
   return (
     <ul className={`flex flex-wrap gap-x-4 gap-y-1.5 text-xs text-ink-2 ${className}`}>
-      <li className="flex items-center gap-2">
-        <span aria-hidden className="h-1 w-5 rounded-full bg-[#e8edf5] ring-2 ring-[#05080f]" />
-        {T4.mapa.leyendaCamino}
-      </li>
-      <li className="flex items-center gap-2">
-        <span aria-hidden className="size-3 rounded-[4px] border border-[#a8d8ff] bg-[#2f7fd1]/80" />
-        {T4.mapa.leyendaAgua}
-      </li>
-      <li className={`items-center gap-2 ${sinLaguna ? "hidden" : "flex"}`}>
-        <span aria-hidden className="size-3 rounded-[4px] border border-dashed border-[#cfd8e6] bg-[#1b4a7d]/70" />
-        {T4.mapa.leyendaLaguna}
-      </li>
+      {LEYENDA.map(([color, texto]) => (
+        <li key={texto} className="flex items-center gap-2">
+          <span aria-hidden className={`h-1 w-5 rounded-full ${color}`} />
+          {texto}
+        </li>
+      ))}
     </ul>
   );
 }
 
 export default function Demo() {
   const [destinoId, setDestinoId] = useState(DESTINO_INICIAL);
-  /** Cada consulta suma uno: el agua vuelve a aparecer y la respuesta se vuelve a anunciar. */
+  /** Cada consulta suma uno: la respuesta se vuelve a anunciar. */
   const [vuelta, setVuelta] = useState(0);
   const menos = useMenosMovimiento();
   const raiz = useRef<HTMLDivElement>(null);
-  // El agua aparece (animada) recién la primera vez que la demo se ve; fuera de pantalla no se anima.
-  const { visible, vista } = useVisibilidad(raiz);
+  const { vista } = useVisibilidad(raiz);
+  const radar = useRadar();
   const MapaDemo = useMapa();
 
   const destino = DATOS.destinos.find((d) => d.id === destinoId) ?? DATOS.destinos[0];
 
-  // Todo sale de la lógica pura: muestreo cada 5 m, punto en polígono, 50 m seguidos.
+  // Todo sale de la medición del radar: un camino está cortado si pisa algún tramo intransitable.
   const calculo = useMemo(() => {
-    const tapados = destino.caminos.map((c) => caminoTapado(c.coords, POL_AGUA, POL_LAGUNAS));
+    const tapados = destino.caminos.map((c) => c.cortes.length > 0);
     const v = veredicto(tapados);
     const libre = destino.caminos.find((c, i) => i > 0 && !tapados[i]);
     const recomendado = v === "llegas" ? destino.caminos[0] : v === "alternativo" ? (libre ?? null) : null;
-    const metrosCharco: Record<string, number> = {};
-    for (const a of AGUA) {
-      if (a.tipo !== "charco") continue;
-      metrosCharco[a.id] = Math.max(0, ...destino.caminos.map((c) => tramoTapadoMaxM(c.coords, [a.coords], POL_LAGUNAS)));
-    }
-    const lagunasQueTocan = new Set(
-      LAGUNAS.filter((a) => destino.caminos.some((c) => tramoTapadoMaxM(c.coords, [a.coords]) > 0)).map((a) => a.id),
-    );
-    const aguaSobreCamino: { n: number; centro: LatLon }[] = [];
-    destino.caminos.forEach((c, i) => {
-      if (!tapados[i]) return;
-      const tramo = tramoTapadoMasLargo(c.coords, POL_AGUA, POL_LAGUNAS);
-      if (tramo.centro && tramo.metros < AGUA_CORTA_M) aguaSobreCamino.push({ n: c.n, centro: tramo.centro });
-    });
-    return { tapados, v, recomendado, metrosCharco, lagunasQueTocan, aguaSobreCamino };
+    const aguaSobreCamino = destino.caminos.flatMap((c) => c.cortes.map((k) => ({ n: c.n, centro: k.centro })));
+    return { tapados, v, recomendado, aguaSobreCamino };
   }, [destino]);
 
   const elegir = (id: string) => {
@@ -128,6 +129,15 @@ export default function Demo() {
   };
 
   const ok = calculo.v !== "no-llegas";
+  const barroKm = calculo.recomendado?.radar_km.con_barro ?? 0;
+  const barro = calculo.v === "llegas" && barroKm > 0;
+  const tono = !ok
+    ? { caja: "border-danger/45 bg-danger-bg text-danger", icono: "bg-danger/20" }
+    : barro
+      ? { caja: "border-warn/45 bg-warn-bg text-warn", icono: "bg-warn/20" }
+      : { caja: "border-ok/45 bg-ok-bg text-ok", icono: "bg-ok/20" };
+  const Icono = !ok ? X : barro ? TriangleAlert : Check;
+  const medido = calculo.recomendado ?? destino.caminos[0];
   const sinOtro = !destino.alternativa.existe && calculo.v === "no-llegas";
   const resumen = T4.mapa.resumen(destino.nombre, [
     ...destino.caminos.map((c, i) => T4.mapa.resumenCamino(c.n, c.km, calculo.tapados[i])),
@@ -142,7 +152,7 @@ export default function Demo() {
         <div className="hidden sm:block">
           <p className="text-base leading-snug text-ink-2 sm:text-lg">{T4.bajada}</p>
           <p className="mt-1.5 hidden text-sm text-ink-3 lg:block">
-            {T4.bajadaNota} {T4.regla}
+            {T4.bajadaNota(FECHA)} {T4.regla}
           </p>
         </div>
       </Reveal>
@@ -172,21 +182,17 @@ export default function Demo() {
                 <p className="text-xs font-medium text-ink-3">{T4.respuesta.titulo(destino.nombre)}</p>
                 <p
                   key={`cartel-${destino.id}-${vuelta}`}
-                  className={`${s.veredicto} mt-2 grid grid-cols-[minmax(0,1fr)_auto_minmax(0,1fr)] items-center gap-2 rounded-2xl border px-3 py-2.5 sm:gap-3 sm:px-4 sm:py-3 ${
-                    ok ? "border-ok/45 bg-ok-bg text-ok" : "border-danger/45 bg-danger-bg text-danger"
-                  }`}
+                  className={`${s.veredicto} mt-2 grid grid-cols-[minmax(0,1fr)_auto_minmax(0,1fr)] items-center gap-2 rounded-2xl border px-3 py-2.5 sm:gap-3 sm:px-4 sm:py-3 ${tono.caja}`}
                 >
                   <span
                     aria-hidden
-                    className={`flex size-7 shrink-0 items-center justify-center justify-self-end rounded-full sm:size-9 ${
-                      ok ? "bg-ok/20" : "bg-danger/20"
-                    }`}
+                    className={`flex size-7 shrink-0 items-center justify-center justify-self-end rounded-full sm:size-9 ${tono.icono}`}
                   >
-                    {ok ? <Check className="size-4 sm:size-5" strokeWidth={3} /> : <X className="size-4 sm:size-5" strokeWidth={3} />}
+                    <Icono className="size-4 sm:size-5" strokeWidth={3} />
                   </span>
                   <span className="flex min-w-0 flex-col items-center">
                     <span className="whitespace-nowrap text-[22px] font-semibold leading-none tracking-[0.03em] min-[400px]:text-2xl sm:text-3xl sm:tracking-[0.04em]">
-                      {ok ? T4.respuesta.transitable : T4.respuesta.intransitable}
+                      {!ok ? T4.respuesta.intransitable : barro ? T4.respuesta.conBarro : T4.respuesta.transitable}
                     </span>
                     {calculo.v === "alternativo" && calculo.recomendado && (
                       <span className="mt-1 text-sm font-medium text-ink">
@@ -200,10 +206,13 @@ export default function Demo() {
                   className={`${s.veredicto} mt-2.5 text-balance text-lg font-medium leading-snug tracking-[-0.01em] text-ink sm:mt-3 sm:text-[1.35rem] lg:mt-2.5 lg:text-xl`}
                   style={{ animationDelay: "60ms" }}
                 >
-                  {T4.frases[calculo.v]}
+                  {barro ? T4.frases.barro(barroKm) : T4.frases[calculo.v]}
                 </p>
               </div>
               {sinOtro && <p className="mt-1.5 text-center text-sm text-ink-2">{T4.unSoloCamino}</p>}
+              <p className="mt-1.5 text-center text-xs text-ink-3">
+                {T4.medido(medido.km - medido.radar_km.sin_medir - medido.radar_km.sin_dato, medido.km)}
+              </p>
             </div>
           </div>
 
@@ -225,14 +234,9 @@ export default function Demo() {
                   caminos={destino.caminos}
                   tapados={calculo.tapados}
                   recomendado={calculo.recomendado?.n ?? null}
-                  aguaNueva={vista ? AGUA : []}
-                  lagunas={LAGUNAS}
-                  metrosCharco={calculo.metrosCharco}
-                  lagunasQueTocan={calculo.lagunasQueTocan}
+                  radar={vista ? radar : null}
                   aguaSobreCamino={calculo.aguaSobreCamino}
-                  vuelta={vuelta}
                   menosMovimiento={menos}
-                  visible={visible}
                   onElegir={elegir}
                 />
               )}
@@ -244,12 +248,12 @@ export default function Demo() {
               className="pointer-events-none absolute inset-0 z-10 bg-[radial-gradient(130%_100%_at_60%_45%,transparent_55%,rgb(6_10_19/0.6))]"
             />
 
-            {/* Aviso: el agua es simulada (siempre visible) */}
+            {/* Aviso: de qué pasada del radar sale el estado (siempre visible) */}
             <div className="pointer-events-none absolute left-3 top-3 z-20 flex flex-col items-start gap-2 lg:bottom-3 lg:top-auto">
-              <p className="inline-flex items-center gap-2 rounded-full border border-warn/45 bg-[#1a1408]/85 px-3 py-1.5 text-xs font-semibold text-warn shadow-[0_8px_24px_-8px_rgb(0_0_0/0.7)] backdrop-blur-md opaco:bg-[#1a1408]">
-                <FlaskConical aria-hidden className="size-3.5" strokeWidth={2.25} />
-                {T4.mapa.datosPrueba}
-                <span className="font-normal text-[#fde68a]/85">· {T4.mapa.datosPruebaDetalle}</span>
+              <p className="inline-flex items-center gap-2 rounded-full border border-ok/45 bg-[#07140f]/85 px-3 py-1.5 text-xs font-semibold text-ok shadow-[0_8px_24px_-8px_rgb(0_0_0/0.7)] backdrop-blur-md opaco:bg-[#07140f]">
+                <Radar aria-hidden className="size-3.5" strokeWidth={2.25} />
+                {T4.mapa.datosReales}
+                <span className="font-normal text-[#a7f3d0]/85">· {T4.mapa.datosRealesDetalle(FECHA)}</span>
               </p>
               <Leyenda className="hidden flex-col rounded-2xl border border-line bg-[#070c16]/80 px-3.5 py-2.5 backdrop-blur-md opaco:bg-[#070c16] lg:flex" />
             </div>
@@ -257,7 +261,7 @@ export default function Demo() {
             <figcaption className="sr-only">{resumen}</figcaption>
           </figure>
 
-          <Leyenda className="order-5 -mt-0.5 lg:hidden" sinLaguna />
+          <Leyenda className="order-5 -mt-0.5 lg:hidden" />
         </div>
       </Reveal>
 
