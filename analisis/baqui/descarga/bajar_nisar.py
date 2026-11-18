@@ -1,6 +1,6 @@
 """Lee por internet solo la ventana de San Martín de los GCOV de NISAR y la guarda chica.
 
-Uso: python -m baqui.bajar_nisar
+Uso: python -m baqui.descarga.bajar_nisar
 Salida: datos/nisar/<fecha>_<orbita>.npz con HHHH, HVHV, mask, x, y y el EPSG.
 """
 import sys, time

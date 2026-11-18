@@ -15,7 +15,7 @@ from pathlib import Path
 
 import numpy as np
 
-from baqui.bajar_capas import BBOX, RAIZ
+from baqui.descarga.bajar_capas import BBOX, RAIZ
 
 CARPETA = RAIZ / "imerg" / "grilla"
 

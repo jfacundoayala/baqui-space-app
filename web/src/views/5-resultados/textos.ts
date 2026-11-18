@@ -5,12 +5,12 @@
 export const textos = {
   tituloSeccion: "Cómo lo sabe BAQUI",
   // "Zona" y no "camino": el campo de alrededor subió casi lo mismo (+1,57 dB contra +1,63 dB en el eje), el radar no
-  // separa el camino de su entorno (docs/HIPOTESIS-FISICA.md, sección 3). Elegido por Facundo, 15/11.
+  // separa el camino de su entorno (docs/hipotesis-fisica.md, sección 3). Elegido por Facundo, 15/11.
   titulo: "El radar ve la zona mojada.",
   bajada: "Medición real del radar NISAR (NASA-ISRO) en el corredor de General San Martín, Chaco. Verificable gratis.",
 
   // Hipótesis física, arriba del número: primero la causa, después la prueba (pedido de Facundo, 15/11).
-  // Sale de docs/HIPOTESIS-FISICA.md, sección 1.
+  // Sale de docs/hipotesis-fisica.md, sección 1.
   hipotesis: {
     etiqueta: "Hipótesis física",
     titulo: "Por qué pasa",

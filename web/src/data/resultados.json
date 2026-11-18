@@ -1,5 +1,5 @@
 {
-  "_fuente": "Real, no simulado. Números copiados de datos/chequeos/salida_corredor.json (claves 1_eje_tierra, 2_eje_tierra y km_osm_por_tipo) y datos/nisar/secado.json (baqui/secado.py). Explicados en docs/HIPOTESIS-FISICA.md. NISAR GCOV, órbita 161 ascendente: pasada 2 días después de la lluvia contra la pasada de referencia de la misma órbita (no del todo seca: IMERG 3,95 mm ese día; una referencia mojada achica la suba, ver docs/HIPOTESIS-FISICA.md sección 4).",
+  "_fuente": "Real, no simulado. Números copiados de datos/chequeos/salida_corredor.json (claves 1_eje_tierra, 2_eje_tierra y km_osm_por_tipo) y datos/nisar/secado.json (baqui/secado.py). Explicados en docs/hipotesis-fisica.md. NISAR GCOV, órbita 161 ascendente: pasada 2 días después de la lluvia contra la pasada de referencia de la misma órbita (no del todo seca: IMERG 3,95 mm ese día; una referencia mojada achica la suba, ver docs/hipotesis-fisica.md sección 4).",
   "radar": {
     "satelite": "NISAR (NASA-ISRO)",
     "banda": "L",
@@ -26,7 +26,7 @@
     "pct_campo_lejos_mas_de_3_db": 3.2
   },
   "zona_abierta": {
-    "_fuente": "Sin monte, para comparar lo mismo con lo mismo. salida_corredor.json → 1_eje_tierra_abierto.dHH_mediana_db (eje del camino sin monte); salida_rojos.json → campo_300a1000m_corredor.dHH_abierto (campo abierto a 300-1000 m de cualquier camino). Muestra que se mojó toda la zona, no solo el camino (docs/HIPOTESIS-FISICA.md, sección 3, fila 2).",
+    "_fuente": "Sin monte, para comparar lo mismo con lo mismo. salida_corredor.json → 1_eje_tierra_abierto.dHH_mediana_db (eje del camino sin monte); salida_rojos.json → campo_300a1000m_corredor.dHH_abierto (campo abierto a 300-1000 m de cualquier camino). Muestra que se mojó toda la zona, no solo el camino (docs/hipotesis-fisica.md, sección 3, fila 2).",
     "eje_db": 1.63,
     "campo_db": 1.57
   },
@@ -36,7 +36,7 @@
     "pct_con_agua": 0.006
   },
   "secado": {
-    "_fuente": "datos/nisar/secado.json con baqui/secado.py: ajuste log-lineal sobre los caminos 1 a 3, 3 pares (pasada después de la lluvia contra su referencia) de 2, 7 y 10 días (sin el de 14, de otra versión de proceso). Mezcla 3 órbitas: indicativo (docs/HIPOTESIS-FISICA.md, fila 6).",
+    "_fuente": "datos/nisar/secado.json con baqui/secado.py: ajuste log-lineal sobre los caminos 1 a 3, 3 pares (pasada después de la lluvia contra su referencia) de 2, 7 y 10 días (sin el de 14, de otra versión de proceso). Mezcla 3 órbitas: indicativo (docs/hipotesis-fisica.md, fila 6).",
     "media_vida_dias": 5.7,
     "pasadas_usadas": 3
   }

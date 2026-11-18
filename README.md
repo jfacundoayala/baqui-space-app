@@ -88,7 +88,7 @@ Step by step:
 | OpenStreetMap | Lines | Rasterized: centerline (within 10 m) and field strips for comparison |
 
 
-The details are in [`analisis/docs/HIPOTESIS-FISICA.md`](analisis/docs/HIPOTESIS-FISICA.md) and [`analisis/docs/ALGORITMO-BAQUI.md`](analisis/docs/ALGORITMO-BAQUI.md).
+The details are in [`docs/hipotesis-fisica.md`](docs/hipotesis-fisica.md) and [`docs/algoritmo.md`](docs/algoritmo.md).
 
 ## 4. NASA data we use
 
@@ -181,12 +181,15 @@ baqui-space-app/
 │   ├── src/data/           resultados.json: the real numbers with their source
 │   └── public/             Images
 ├── analisis/               The science (Python)
-│   ├── baqui/              Download, measurement, classification, rainfall and drying
+│   ├── baqui/              Measurement, classification, rainfall, drying and routing
+│   ├── baqui/descarga/     NASA data download
+│   ├── baqui/graficos/     Before and after images
 │   ├── baqui/chequeos/     Checks that generate the numbers on the web
 │   ├── tests/              56 tests
-│   ├── db/                 Database schema (PostgreSQL + PostGIS)
-│   └── docs/               Physical hypothesis, algorithm and rules for the state of each segment
-└── docs/                   Pitch and video script, and scalability
+│   └── db/                 Database schema (PostgreSQL + PostGIS)
+├── docs/                   Physical hypothesis, algorithm, state rules and scalability
+│   └── pitch/              Pitch and video script
+└── .github/workflows/      Automatic checks on every change
 ```
 
 ## 9. Real and simulated
@@ -220,7 +223,7 @@ baqui-space-app/
 
 About 1,500 times less to store. With about 91 passes per year over the corridor, the database grows about 105 MB per year. For 100,000 km of roads, what is queried (today's state, one row per segment) takes about 75 MB, and the history goes to compressed files in cheap storage.
 
-Numbers, architecture and schema: [`docs/SCALABILITY.md`](docs/SCALABILITY.md) and [`analisis/db/schema.sql`](analisis/db/schema.sql) (PostgreSQL + PostGIS).
+Numbers, architecture and schema: [`docs/escalabilidad.md`](docs/escalabilidad.md) and [`analisis/db/schema.sql`](analisis/db/schema.sql) (PostgreSQL + PostGIS).
 
 Proposed architecture:
 

@@ -1,11 +1,11 @@
 """Lee una ventana chica de varias pasadas NISAR para seguir cómo se seca el suelo.
 
-Uso: python -m baqui.serie_nisar
+Uso: python -m baqui.descarga.serie_nisar
 Guarda datos/nisar/<fecha>_<orbita>_caminos.npz
 """
 import os, time
 import numpy as np, h5py, earthaccess
-from baqui.bajar_nisar import BASE, SALIDA
+from baqui.descarga.bajar_nisar import BASE, SALIDA
 from pyproj import Transformer
 
 BBOX = (-59.40, -26.65, -59.18, -26.28)   # alrededor de los 3 caminos candidatos

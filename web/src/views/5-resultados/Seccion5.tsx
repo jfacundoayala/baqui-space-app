@@ -307,7 +307,7 @@ export default function Seccion5() {
 
         <div className="grid gap-3 sm:gap-4 lg:grid-cols-12 lg:gap-5">
           {/* Número grande: lo que el radar midió (el eco sube sobre los caminos de tierra y su entorno). Sin km "intransitables":
-              salían de una sospecha, no de un corte confirmado (docs/HIPOTESIS-FISICA.md). */}
+              salían de una sospecha, no de un corte confirmado (docs/hipotesis-fisica.md). */}
           <Reveal delay={50} className="lg:col-span-7">
             <article
               ref={refNumero}
