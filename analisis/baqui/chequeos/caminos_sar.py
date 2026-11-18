@@ -222,5 +222,6 @@ OUT["4_monte_tapa"] = {"pct_eje_tierra_con_monte": round(100 * float(monte[eje["
                        "pct_franja_tierra_con_monte": round(100 * float(monte[franja["tierra"]].mean()), 1)}
 OUT["4_agua_cerca_ruido_hh_seco_lagunas_p50_p05"] = [round(float(np.nanmedian(hh0[siempre])), 2),
                                                      round(float(np.nanpercentile(hh0[siempre], 5)), 2)]
+os.makedirs(f"{R}/chequeos", exist_ok=True)
 Path(f"{R}/chequeos/salida_corredor.json").write_text(json.dumps(OUT, indent=1, ensure_ascii=False), encoding="utf-8")
 print(json.dumps(OUT, indent=1, ensure_ascii=False))

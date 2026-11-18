@@ -28,6 +28,7 @@ def ventana(f):
 
 def main():
     earthaccess.login()
+    os.makedirs(SALIDA, exist_ok=True)
     r = earthaccess.search_data(short_name="NISAR_L2_GCOV_PROVISIONAL_V1", point=(-59.34, -26.54),
                                 temporal=("2026-09-28", "2026-10-12"))
     r = [g for g in r if "_161_A_164_" in g["meta"]["native-id"]]

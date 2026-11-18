@@ -22,6 +22,7 @@ PASADAS = [  # (colección, texto que identifica el archivo)
 
 def main():
     earthaccess.login()
+    os.makedirs(SALIDA, exist_ok=True)
     for col, clave in PASADAS:
         p = clave.split("_")
         fecha, orbita = p[-1], p[1] + p[2] + p[3]

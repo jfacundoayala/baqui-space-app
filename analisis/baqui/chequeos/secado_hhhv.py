@@ -139,5 +139,6 @@ ci = np.where((ix >= zc["x"].min()) & (ix <= zc["x"].max()))[0]; ri = np.where((
 a = inc[:, ri.min():ri.max() + 1, ci.min():ci.max() + 1]
 a = a[np.isfinite(a)]
 OUT["4_incidencia_corredor_161A_grados"] = [round(float(a.min()), 1), round(float(a.max()), 1)]
+os.makedirs(f"{R}/chequeos", exist_ok=True)
 Path(f"{R}/chequeos/salida_secado.json").write_text(json.dumps(OUT, indent=1, ensure_ascii=False), encoding="utf-8")
 print(json.dumps(OUT, indent=1, ensure_ascii=False))
