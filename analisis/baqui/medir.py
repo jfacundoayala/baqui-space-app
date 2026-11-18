@@ -9,7 +9,7 @@ Uso:
 Salida: datos/nisar/tramos_<después>[_<hoy>].geojson (un tramo por feature, con medidas y color).
 Con --hoy posterior a la pasada se suma la lluvia IMERG del tramo (baqui/lluvia.py) y cuenta la edad del radar.
 
-Pasos por píxel (docs/ALGORITMO-BAQUI.md y docs/clasificacion-semaforo.md):
+Pasos por píxel (docs/algoritmo.md y docs/clasificacion-semaforo.md):
   1. Máscara de NISAR: vale solo 1..254. El 0 es "parcialmente enfocado" y el 255 queda fuera de la toma
      (lo dice el atributo `description` de `mask` en el GCOV).
   2. HH y HV en dB, con filtro de mediana de 3 × 3 para sacar el moteado.

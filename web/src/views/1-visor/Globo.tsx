@@ -271,7 +271,7 @@ export default function Globo({ activo, menos }: { activo: boolean; menos: boole
 
     const cargador = new THREE.TextureLoader();
     let texTierra: THREE.Texture | null = null;
-    cargador.load("/assets-view1/tierra-blue-marble-2048.webp", (tex) => {
+    cargador.load("/globo/tierra-blue-marble-2048.webp", (tex) => {
       if (!vivo) {
         tex.dispose();
         return;
